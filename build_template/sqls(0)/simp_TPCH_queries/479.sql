@@ -1,0 +1,1 @@
+EXPLAIN (ANALYZE,VERBOSE,COSTS,BUFFERS,TIMING,SUMMARY,FORMAT JSON)  SELECT *  FROM region  JOIN nation  ON region.r_regionkey = nation.n_regionkey  WHERE  region.r_regionkey >= 3 

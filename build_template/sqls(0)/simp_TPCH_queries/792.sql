@@ -1,0 +1,1 @@
+EXPLAIN (ANALYZE,VERBOSE,COSTS,BUFFERS,TIMING,SUMMARY,FORMAT JSON)  SELECT *  FROM lineitem  WHERE   lineitem.l_extendedprice >= 15264  ORDER BY l_shipmode 

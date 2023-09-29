@@ -1,0 +1,1 @@
+EXPLAIN (ANALYZE,VERBOSE,COSTS,BUFFERS,TIMING,SUMMARY,FORMAT JSON)  SELECT *  FROM lineitem  WHERE  lineitem.l_linenumber >= 3  ORDER BY l_shipdate 
