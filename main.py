@@ -10,32 +10,27 @@ from utils.util import Utils
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-net = ['QPPNet', 'Net_v2']
 
 dstype_type_dict = {
     'tpch': 'PSQLTPCH',
-    'tpcc': 'PSQLTPCC',
     'sysbench': 'PSQLSysbench',
     'job': 'PSQLJOB',
 }
 
 data_dir_dict = {
     'tpch': 'tpch',
-    'tpcc': 'tpcc',
     'sysbench': 'sysbench',
     'job': 'job',
 }
 
 start_epoch = {
     'tpch': 0,
-    'tpcc': 0,
     'sysbench': 0,
     'job': 0,
 }
 
 end_epoch = {
     'tpch': 400,
-    'tpcc': 100,
     'sysbench': 100,
     'job': 800,
 }
@@ -56,32 +51,26 @@ if __name__ == '__main__':
         'tpch',
         # 'sysbench',
         # 'job',
-        # 'tpcc',
     ]
     # level 2
     mid_data_dirs = [
-        # "origin_model",
+        "origin_model",
         # "knob_model",
-        "knob_modelchange",
-        "knob_modelchange_shap",
+        # "knob_modelchange",
         # "knob_modelchange_template",
-        # "pro_model",
         # "knob_model_shap",
-        # "knob_model_shap4net",
         # "knob_model_grad",
         # 'knob_model_R2',
         # 'knob_modeltemplate' + str(template_num * 1),
         # 'knob_modeltemplate' + str(template_num * 2),
         # 'knob_modeltemplate' + str(template_num * 3),
         # 'knob_modeltemplate' + str(template_num * 4),
-        # 'mobility_model'
     ]
 
     # level 3
     model_types = [
         "QPPNet",
         # "RandomForest",
-        # "Net_v2",
         # "MSCN",
         # "GradientBoosting",
     ]
@@ -102,67 +91,7 @@ if __name__ == '__main__':
                 for model_type in model_types:
 
                     new_md = True if model_type == 'QPPNet' or model_type == 'MSCN' else False
-
-                    if 'mobility' in model:
-
-                        mobility_model_dir = './' + version + '/' + data_dir_dict[
-                            benchmark_type] + "_mobility_" + model_type
-                        opt = getParser(version=version,
-                                        dataset=dstype_type_dict[benchmark_type],
-                                        new_ds=False, new_md=True,
-                                        mid_data_dir=mobility_model_dir,
-                                        data_structure='./' + version + '/data_structure',
-                                        data_dir=data_dir_dict[benchmark_type],
-                                        saved_model='/save_model_' + model_type,
-                                        mode='train',
-                                        knobs="0").parse_args()
-                        dataset, dim_dict = build_ds(opt, model)
-                        build_md(dataset, model_type, opt, dim_dict)
-
-                        for knob in range(1, 20, 1):
-                            # 2.1 不迁移的
-                            opt = getParser(version=version,
-                                            dataset=dstype_type_dict[benchmark_type],
-                                            new_ds=False, new_md=True,
-                                            mid_data_dir=mobility_model_dir,
-                                            data_structure='./' + version + '/data_structure',
-                                            data_dir=data_dir_dict[benchmark_type],
-                                            saved_model='/save_model_' + model_type,
-                                            mode='mobility_eval',
-                                            knobs=str(knob),
-                                            change=True).parse_args()
-
-                            dataset, dim_dict = build_ds(opt, model)
-                            build_md(dataset, model_type, opt, dim_dict)
-
-                            opt = getParser(version=version,
-                                            dataset=dstype_type_dict[benchmark_type],
-                                            new_ds=False, new_md=True,
-                                            mid_data_dir=mobility_model_dir,
-                                            data_structure='./' + version + '/data_structure',
-                                            data_dir=data_dir_dict[benchmark_type],
-                                            saved_model='/save_model_' + model_type,
-                                            mode='mobility_eval',
-                                            knobs=str(knob)).parse_args()
-
-                            dataset, dim_dict = build_ds(opt, model)
-                            build_md(dataset, model_type, opt, dim_dict)
-
-                            # 2.2 迁移的
-                            opt = getParser(version=version,
-                                            dataset=dstype_type_dict[benchmark_type],
-                                            new_ds=False, new_md=True,
-                                            mid_data_dir=mobility_model_dir,
-                                            data_structure='./' + version + '/data_structure',
-                                            data_dir=data_dir_dict[benchmark_type],
-                                            saved_model='/save_model_' + model_type,
-                                            mode='part_train',
-                                            knobs=str(knob)).parse_args()
-
-                            build_md(dataset, model_type, opt, dim_dict)
-                        break
-
-                    elif 'knob_model_' in model:
+                    if 'knob_model_' in model:
 
                         filter_type = model.replace("knob_model_", "")
 
@@ -266,4 +195,6 @@ if __name__ == '__main__':
                             continue
 
                         dataset, dim_dict = build_ds(opt, model)
+                        print(dim_dict)
                         build_md(dataset, model_type, opt, dim_dict)
+

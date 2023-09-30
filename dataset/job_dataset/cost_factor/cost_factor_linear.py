@@ -133,26 +133,6 @@ def get_mergejoin_cost_factor_dic(data):
 
     return a1, error1
 
-    # X = np.ones((data.shape[0], 3), dtype=float)
-    # x0_list = np.multiply(list(data[:, 2]), list(data[:, 3]))
-    #
-    # X[:, 0] = x0_list
-    # X[:, 1] = data[:, 2]
-    # X[:, 2] = data[:, 3]
-    #
-    # y = data[:, 1]
-    #
-    # a2, error2 = linear4(X, y)
-    #
-    # if error2 > error1:
-    #     a = a1
-    #     error = error1
-    # else:
-    #     a = a2
-    #     error = error2
-    #
-    # return a, error
-
 
 def get_index_cost_factor_dic(data):
     X = data[:, 0]

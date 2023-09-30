@@ -1,1 +1,0 @@
-EXPLAIN (ANALYZE,VERBOSE,COSTS,BUFFERS,TIMING,SUMMARY,FORMAT JSON)  SELECT *  FROM lineitem  WHERE  lineitem.l_extendedprice >= 3761  ORDER BY l_quantity 

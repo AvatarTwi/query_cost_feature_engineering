@@ -1,17 +1,10 @@
 import pickle
-
 import config
-from dataset.oltp_dataset.oltp_utils_origin import OLTPDataSet as OLTPDataSet_origin,tpcc_dim as origin_tpcc_dim
-from dataset.oltp_dataset.oltp_utils_knob import OLTPDataSet as OLTPDataSet_knob,tpcc_dim as knob_tpcc_dim
-from dataset.oltp_dataset.oltp_utils_serialize import OLTPDataset as OLTPDataSet_serialize
-from dataset.oltp_dataset.oltp_utils_serialize_knob import OLTPDataset as OLTPDataSet_knob_serialize
 
 from dataset.postgres_tpch_dataset.tpch_utils_origin import tpch_dim_dict as origin_tpch_dim, \
     PSQLTPCHDataSet as PSQLTPCHDataSet_origin
 from dataset.postgres_tpch_dataset.tpch_utils_knob import tpch_dim_dict as knob_tpch_dim, \
     PSQLTPCHDataSet as PSQLTPCHDataSet_knob
-from dataset.postgres_tpch_dataset.tpch_utils_pro import tpch_dim_dict as pro_tpch_dim, \
-    PSQLTPCHDataSet as PSQLTPCHDataSet_pro
 from dataset.postgres_tpch_dataset.tpch_utils_serialize import \
     PSQLTPCHDataSet as PSQLTPCHDataSet_serialize
 from dataset.postgres_tpch_dataset.tpch_utils_serialize_knob import \
@@ -33,12 +26,10 @@ PSQLTPCH={
     "dim_dict":{
         "origin_model": origin_tpch_dim,
         "knob_model": knob_tpch_dim,
-        "pro_model": pro_tpch_dim,
     },
     "dataset":{
         "origin_model": PSQLTPCHDataSet_origin,
         "knob_model": PSQLTPCHDataSet_knob,
-        "pro_model": PSQLTPCHDataSet_pro,
         "serialize": PSQLTPCHDataSet_serialize,
         "serialize_knob": PSQLTPCHDataSet_knob_serialize,
     }
@@ -53,18 +44,6 @@ PSQLSysbench={
         "knob_model": SysbenchDataset_knob,
         "serialize": SysbenchDataset_serialize,
         "serialize_knob": SysbenchDataset_knob_serialize,
-    }
-}
-PSQLTPCC={
-    "dim_dict":{
-        "origin_model": origin_tpcc_dim,
-        "knob_model": knob_tpcc_dim,
-    },
-    "dataset":{
-        "origin_model": OLTPDataSet_origin,
-        "knob_model": OLTPDataSet_knob,
-        "serialize": OLTPDataSet_serialize,
-        "serialize_knob": OLTPDataSet_knob_serialize,
     }
 }
 PSQLJOB={
@@ -82,7 +61,6 @@ PSQLJOB={
 
 DATASET_TYPE = {
     "PSQLTPCH": PSQLTPCH,
-    "PSQLTPCC": PSQLTPCC,
     "PSQLSysbench": PSQLSysbench,
     "PSQLJOB": PSQLJOB
 }

@@ -133,26 +133,6 @@ def get_mergejoin_cost_factor_dic(data):
 
     return a1, error1
 
-    # X = np.ones((data.shape[0], 3), dtype=float)
-    # x0_list = np.multiply(list(data[:, 2]), list(data[:, 3]))
-    #
-    # X[:, 0] = x0_list
-    # X[:, 1] = data[:, 2]
-    # X[:, 2] = data[:, 3]
-    #
-    # y = data[:, 1]
-    #
-    # a2, error2 = linear4(X, y)
-    #
-    # if error2 > error1:
-    #     a = a1
-    #     error = error1
-    # else:
-    #     a = a2
-    #     error = error2
-    #
-    # return a, error
-
 
 def get_index_cost_factor_dic(data):
     X = data[:, 0]
@@ -228,25 +208,6 @@ train_size = 0.8
 n_splines = 4
 bias = 0.02
 exp = 1
-
-
-def linear(op_data_dic, opt):
-    start_time = time.time()
-    for op in all_dicts:
-        if op in op_data_dic.keys():
-            cost_factor_dict[op], error[op] = sysbench_GET_COST_FACTOR_DIC[op](np.array(op_data_dic[op]))
-        else:
-            cost_factor_dict[op] = [0]
-            error[op] = 0
-
-    end_time = time.time()
-    error["total_time"] = str(int(round((end_time - start_time))))
-
-    with open(opt.data_structure + '/cost_factor_dict_linear_' + 'exp' + str(exp) + '.pickle', 'wb') as f:
-        pickle.dump(cost_factor_dict, f)
-    with open(opt.data_structure + '/cost_factor_dict_linear_error_' + 'exp' + str(exp) + '.pickle', 'wb') as f:
-        pickle.dump(error, f)
-
 
 def linear1(op_data_dic):
     for op in all_dicts:

@@ -16,8 +16,6 @@ from utils.metric import Metric
 from sklearn.ensemble import RandomForestRegressor
 import pickle
 
-from openfe import openfe
-
 basic = 3
 
 
@@ -56,14 +54,6 @@ class RandomForest():
             with open("./2200-2000-2000-2000/" + opt.data_dir.split("/")[-1] + "/knob_model/save_model_RandomForest/"
                       + str(opt.batch_size) + "/"+filter_type+"_values_array.pickle", "rb") as f:
                 self.save_values_array = pickle.load(f)
-
-        self.select = True if "select" in opt.mid_data_dir else False
-        if os.path.exists(
-                "./2200-2000-2000-2000/" + opt.data_dir.split("/")[-1] + "/knob_model/save_model_RandomForest/"
-                + str(opt.batch_size) + "/openfe_values_array.pickle"):
-            with open("./2200-2000-2000-2000/" + opt.data_dir.split("/")[-1] + "/knob_model/save_model_RandomForest/"
-                      + str(opt.batch_size) + "/openfe_values_array.pickle", "rb") as f:
-                self.features_array = pickle.load(f)
 
         self.save_X = {}
         self.save_y = {}
@@ -152,18 +142,6 @@ class RandomForest():
             if self.filter:
                 pred_time = self.models[operator].predict(
                     self.filterfunc1(input_vec, self.save_values_array[samp_batch['node_type']]))
-            else:
-                pred_time = self.models[operator].predict(input_vec)
-
-        else:
-            if samp_batch['node_type'] in self.features_array.keys():
-                ofe = openfe.OpenFE()
-                ofe.verbose = False
-                ofe.tmp_save_path = "./openfe_tmp_data_RF.feather"
-
-                input_vec = self.filterfunc1(input_vec, self.save_values_array[samp_batch['node_type']])
-                temp = self.ofe_transform(np.array(input_vec), operator)
-                pred_time = self.models[operator].predict(temp)
             else:
                 pred_time = self.models[operator].predict(input_vec)
 
@@ -298,7 +276,6 @@ class RandomForest():
         self.eval = True
         self.save = True
         self.filter = False
-        self.select = False
         self.regress(0)
         self.last_test_loss = self.test_loss.item()
         self.last_pred_err = self.pred_err.item()
@@ -350,54 +327,6 @@ class RandomForest():
 
         return shap_values_array
 
-    def calculate_openfe(self, eval_dataset):
-
-        self.test = True
-        self.set_input(eval_dataset)
-        self.eval = True
-        self.save = True
-        self.regress(0)
-        self.last_test_loss = self.test_loss.item()
-        self.last_pred_err = self.pred_err.item()
-        self.test_loss, self.pred_err = None, None
-
-        if os.path.exists(self.save_dir + "/openfe_values_array.pickle"):
-            with open(self.save_dir + "/openfe_values_array.pickle", "rb") as f:
-                features_array = pickle.load(f)
-        else:
-            features_array = {}
-
-        for operator in self.dim_dict:
-            print(operator)
-            if operator in features_array.keys():
-                continue
-
-            if self.save_X[operator] == []:
-                continue
-            samp = np.random.choice(np.arange(len(self.save_X[operator])), 40, replace=True)
-            X = np.array(self.save_X[operator])[samp]
-            y = np.array(self.save_y[operator])[samp]
-
-            del self.save_X[operator]
-            del self.save_y[operator]
-
-            ofe = openfe.OpenFE()
-            try:
-                train_x = pd.DataFrame(X, columns=[str(col) for col in range(X.shape[1])])
-                train_y = pd.DataFrame(y, columns=['1'])
-                features = ofe.fit(data=train_x,
-                                   label=train_y,
-                                   tmp_save_path='./openfe_tmp_data_RF.feather',
-                                   n_jobs=8,
-                                   verbose=False)
-                features_array[operator] = features
-            except:
-                continue
-
-            with open(self.save_dir + "/openfe_values_array.pickle", "wb") as f:
-                pickle.dump(features_array, f)
-
-        return features_array
 
     def calculate_R2(self, eval_dataset):
         self.test = True
@@ -405,7 +334,6 @@ class RandomForest():
         self.eval = True
         self.save = True
         self.filter = False
-        self.select = False
         self.regress(0)
         self.last_test_loss = self.test_loss.item()
         self.last_pred_err = self.pred_err.item()
@@ -453,59 +381,6 @@ class RandomForest():
         self.last_pred_err = self.pred_err
         self.test_loss, self.pred_err = None, None
 
-    def openfe_train(self):
-        self.test = False
-        print("begin train")
-        self.regress(0)
-
-        print("begin openfe_train")
-        for operator in self.dim_dict:
-
-            if self.save_X[operator] == []:
-                continue
-            if operator in self.features_array.keys():
-                ofe = openfe.OpenFE()
-                ofe.verbose = False
-                ofe.tmp_save_path = "./openfe_tmp_data_RF.feather"
-                try:
-                    input_vec = self.filterfunc1(np.array(self.save_X[operator]), self.save_values_array[operator])
-                    temp = self.ofe_transform(input_vec, operator)
-                    self.models[operator].fit(np.array(temp), np.array(self.save_y[operator]))
-                except:
-                    self.models[operator].fit(self.save_X[operator], self.save_y[operator])
-                    del self.features_array[operator]
-                    print('del self.features_array[operator]:', operator)
-            else:
-                self.models[operator].fit(
-                    self.save_X[operator],
-                    self.save_y[operator])
-
-        print("save_units")
-        self.save_units(0)
-
-    def openfe_eval(self, dataset):
-        self.eval = True
-        self.test = True
-        self.last = True
-        print("begin openfe_eval")
-
-        self.set_input(dataset)
-        self.regress(0)
-
-        self.last_total_loss = self.total_loss
-        self.last_test_loss = self.test_loss
-        self.last_pred_err = self.pred_err
-        self.test_loss, self.pred_err = None, None
-
-        with open(self.save_dir + "/pred_times.pickle", "wb") as f:
-            pickle.dump(self.pred_times, f)
-        with open(self.save_dir + "/total_times.pickle", "wb") as f:
-            pickle.dump(self.total_times, f)
-        with open(self.save_dir + "/total_costs.pickle", "wb") as f:
-            pickle.dump(self.total_costs, f)
-        with open(self.save_dir + "/plan_times.pickle", "wb") as f:
-            pickle.dump(self.plan_times, f)
-
     def save_units(self, epoch):
         self.best_total_loss = self.total_loss
         self.best_epoch = epoch
@@ -520,17 +395,3 @@ class RandomForest():
     @get_time
     def filterfunc1(self, input_vec, filter_array):
         return input_vec[:, filter_array]
-
-    @get_time
-    def ofe_transform(self, input_vec, op):
-        # input_vec = self.transform(input_vec, 0)
-
-        ofe = openfe.OpenFE()
-        ofe.verbose = False
-        ofe.tmp_save_path = './openfe_tmp_data_QPP.feather'
-
-        input_vec = ofe.transform1(data=input_vec,
-                                   new_features_list=self.features_array[op],
-                                   n_jobs=8)
-
-        return np.array(input_vec)

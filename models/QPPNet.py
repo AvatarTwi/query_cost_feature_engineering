@@ -9,7 +9,6 @@ import shap
 import torch
 import torch.nn as nn
 from matplotlib import pyplot as plt
-from openfe import openfe
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from torch.optim import lr_scheduler
@@ -130,13 +129,6 @@ class QPPNet():
                 for key in self.save_values_array:
                     self.dim_dict[key] = len(self.save_values_array[key])
 
-        self.select = True if "select" in opt.mid_data_dir else False
-        if os.path.exists("./2200-2000-2000-2000/" + opt.data_dir.split("/")[-1] + "/knob_model/save_model_QPPNet/"
-                          + str(opt.batch_size) + "/openfe_values_array.pickle"):
-            with open("./2200-2000-2000-2000/" + opt.data_dir.split("/")[-1] + "/knob_model/save_model_QPPNet/"
-                      + str(opt.batch_size) + "/openfe_values_array.pickle", "rb") as f:
-                self.features_array = pickle.load(f)
-
         self.last_total_loss = None
         self.last_pred_err = None
         self.pred_err = None
@@ -152,12 +144,7 @@ class QPPNet():
         self.best = 100000
 
         for operator in self.dim_dict:
-            if self.select and operator in self.features_array.keys():
-                pass_dim = {}
-                pass_dim[operator] = len(self.features_array[operator]) + self.dim_dict[operator]
-                self.units[operator] = NeuralUnit(operator, pass_dim).to(self.device)
-            else:
-                self.units[operator] = NeuralUnit(operator, self.dim_dict).to(self.device)
+            self.units[operator] = NeuralUnit(operator, self.dim_dict).to(self.device)
 
             if opt.SGD:
                 optimizer = torch.optim.SGD(self.units[operator].parameters(),
@@ -215,25 +202,13 @@ class QPPNet():
             add_on = torch.zeros(input_vec.size()[0], expected_len - input_vec.size()[1]).to(self.device)
             input_vec = torch.cat((input_vec, add_on), axis=1)
 
-        if self.filter and not self.select:
+        if self.filter:
             if samp_batch['node_type'] in self.save_values_array.keys():
                 output_vec = self.units[samp_batch['node_type']](
                     self.filterfunc1(input_vec, self.save_values_array[samp_batch['node_type']])
                 )
             else:
                 output_vec = self.units[samp_batch['node_type']](input_vec)
-        elif self.select:
-            if samp_batch['node_type'] in self.features_array.keys():
-                # print(samp_batch['node_type'])
-
-                input_vec = self.filterfunc(input_vec, self.save_values_array[samp_batch['node_type']], samp=0)
-                input_vec = self.ofe_transform(input_vec, samp_batch['node_type'])
-
-                output_vec = self.units[samp_batch['node_type']](input_vec)
-            else:
-                input_vec = self.filterfunc(input_vec, self.save_values_array[samp_batch['node_type']], samp=0)
-                output_vec = self.units[samp_batch['node_type']](
-                    torch.tensor(np.array(input_vec)).float().to(self.device))
         else:
             output_vec = self.units[samp_batch['node_type']](input_vec)
 
@@ -365,8 +340,6 @@ class QPPNet():
 
                 if epoch % 50 == 0:
                     print("test batch Pred Err: {}".format(self.pred_err))
-                if self.select:
-                    print("epoch {}, test batch Pred Err: {}".format(epoch, self.pred_err))
         else:
             self.curr_losses = {operator: torch.mean(torch.cat(total_losses[operator])).item() for operator in
                                 self.dim_dict}
@@ -699,16 +672,3 @@ class QPPNet():
     @get_time
     def filterfunc1(self, input_vec, filter_array):
         return input_vec[:, filter_array]
-
-    @get_time
-    def ofe_transform(self, input_vec, op):
-
-        ofe = openfe.OpenFE()
-        ofe.verbose = False
-        ofe.tmp_save_path = './openfe_tmp_data_QPP.feather'
-
-        input_vec = ofe.transform1(data=input_vec,
-                                   new_features_list=self.features_array[op],
-                                   n_jobs=8)
-
-        return torch.tensor(np.array(input_vec)).float().to(self.device)

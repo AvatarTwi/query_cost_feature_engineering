@@ -1,1 +1,0 @@
-EXPLAIN (ANALYZE,VERBOSE,COSTS,BUFFERS,TIMING,SUMMARY,FORMAT JSON)  SELECT *  FROM lineitem  WHERE  lineitem.l_linenumber >= 1  ORDER BY l_linestatus 

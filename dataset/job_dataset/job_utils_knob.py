@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from dataset.job_dataset.attr_rel_dict import *
 import pickle
 
-from dataset.job_dataset.cost_factor.cost_factor import cost_factor_main, cost_factor_one2one
+from dataset.job_dataset.cost_factor.cost_factor import cost_factor_one2one
 
 import config
 
@@ -109,7 +109,6 @@ def get_scan_input(plan_dict):
 
 
 def get_index_scan_input(plan_dict):
-    # plan_dict: dict where the plan_dict['node_type'] = 'Index Scan'
 
     rel_vec = get_rel_one_hot(plan_dict['Relation Name'])
     index_vec = get_index_one_hot(plan_dict['Index Name'])
@@ -130,7 +129,6 @@ def get_index_scan_input(plan_dict):
 
 
 def get_bitmap_index_scan_input(plan_dict):
-    # plan_dict: dict where the plan_dict['node_type'] = 'Bitmap Index Scan'
     index_vec = get_index_one_hot(plan_dict['Index Name'])
 
     return get_basics(plan_dict) + index_vec
@@ -188,7 +186,6 @@ def get_aggreg_input(plan_dict):
 
 
 def get_modify_input(plan_dict):
-    # plan_dict: dict where the plan_dict['node_type'] = 'Seq Scan'
     rel_vec = get_rel_one_hot(plan_dict['Relation Name'])
 
     return get_basics(plan_dict) + rel_vec
@@ -247,8 +244,6 @@ class jobDataset():
 
             data = []
             datas = {}
-            train_datas = {}
-            test_datas = {}
             all_groups, all_groups_test, all_groups_train = [], [], []
 
             if opt.new_data_structure:
@@ -257,25 +252,13 @@ class jobDataset():
                     for dir in dirs:
                         fname = root + "/" + dir + "/serverlog"
                         temp_data = self.get_all_plans(fname)
-                        # random.shuffle(temp_data)
-
-                        # train_data, test_data = cost_factor_one2one(opt,dir, temp_data,
                         temp_data = cost_factor_one2one(opt, dir, temp_data,
                                                         int(config.num_per_q[0] / 5))
 
                         for i in range(self.num_q):
                             if i not in datas.keys():
                                 datas[i] = []
-                                # train_datas[i] = []
-                                # test_datas[i] = []
                             datas[i].extend(temp_data)
-                            # train_datas[i].extend(train_data[i])
-                            # test_datas[i].extend(test_data[i])
-                # 消除数据泄漏
-                # for i, train_data in enumerate(train_datas):
-                #     train_datas[i] = random.sample(train_datas[i], int(config.num_per_q[0] * 4 / 5))
-                #     train_datas[i].extend(test_datas[i])
-                #     datas[i] = train_datas[i]
                 with open(opt.data_structure + '/datas.pickle', 'wb') as f:
                     pickle.dump(datas, f)
             else:
@@ -296,10 +279,6 @@ class jobDataset():
                 TrainEnum, testEnum, TrainTempdata, testTempdata = \
                     train_test_split(enum, temp_data, train_size=int(self.num_sample_per_q),
                                      test_size=int(self.num_sample_per_q / 4), random_state=2)
-                # TrainEnum = enum[:int(TRAIN_TEST_SPLIT * len(enum))]
-                # testEnum = enum[int(TRAIN_TEST_SPLIT * len(enum)):]
-                # TrainTempdata = temp_data[:int(TRAIN_TEST_SPLIT * len(enum))]
-                # testTempdata = temp_data[int(TRAIN_TEST_SPLIT * len(enum)):]
 
                 self.grp_idxes += TrainEnum
                 self.num_grps[i] = num_grp
@@ -494,8 +473,6 @@ class jobDataset():
         new_samp_dict = {}
         new_samp_dict["node_type"] = data[0]["Node Type"]
         new_samp_dict["subbatch_size"] = len(data)
-        # feat_vec = np.array([self.input_func[jss["Node Type"]](jss) for jss in data])
-        # np.hstack((a,b))
 
         feat_vec = np.array(
             [np.hstack(
@@ -551,7 +528,6 @@ class jobDataset():
                       for i in range(self.num_q)]
         for idx in samp:
             grp_idx = self.grp_idxes[idx]
-            # idx // self.num_sample_per_q 决定是哪个query
             samp_group[idx // self.num_sample_per_q][grp_idx].append(self.dataset[idx])
 
         parsed_input = []

@@ -4,9 +4,7 @@ import pickle
 import random
 import re
 
-from dataset.sysbench_dataset.cost_factor.cost_factor_linear import linear, linear1
-from dataset.sysbench_dataset.cost_factor.cost_factor_nonlinear import nonlinear, nonlinear1
-from dataset.sysbench_dataset.cost_factor.cost_factor_smart import smart, smart1
+from dataset.sysbench_dataset.cost_factor.cost_factor_linear import linear1
 
 
 def get_all_plans(fname):
@@ -56,57 +54,19 @@ def get_func_input_data(op_data_dic, data):  # Helper for sample_data
 
     op_data_dic[data["Node Type"]].append(data_tuple)
 
-
-def cost_factor_main(opt):
-    datapaths = []
-    op_data_dic = {}
-
-    if not os.path.exists(opt.data_structure + '/op_data_dic.pickle'):
-        for root, dirs, files in os.walk(opt.data_dir):
-            for dir in dirs:
-                datapaths.append(root + "/" + dir + "/serverlog")
-
-        for fname in datapaths:
-            temp_data = get_all_plans(fname)
-            [get_func_input_data(op_data_dic, data) for data in temp_data]
-
-        with open(opt.data_structure + '/op_data_dic.pickle', 'wb') as f:
-            pickle.dump(op_data_dic, f)
-    else:
-        with open(opt.data_structure + '/op_data_dic.pickle', 'rb') as f:
-            op_data_dic = pickle.load(f)
-
-    linear(op_data_dic, opt)
-    # nonlinear(op_data_dic, opt)
-    # smart(op_data_dic, opt)
-
-
-def cost_factor_one2one(opt, dir, temp_data, test_size):
+def cost_factor_one2one(opt, dir, temp_data):
     op_data_dic = {}
     op_data_dic1 = {}
     pattern_num = re.compile(r'\d+')
 
-    # [get_func_input_data(op_data_dic, data) for data in temp_data[test_size:]]
     [get_func_input_data(op_data_dic, data) for data in temp_data]
 
-    # if opt.change:
-    #     fname = opt.data_dir + "_template" + "/" + dir + "/serverlog"
-    #     data4cost = get_all_plans(fname)
-    #     [get_func_input_data(op_data_dic1, data) for data in data4cost]
-    #
-    #     for op in op_data_dic.keys():
-    #         if op not in op_data_dic1.keys():
-    #             op_data_dic1[op] = op_data_dic[op]
-    #
-    #     for op in op_data_dic1.keys():
-    #         op_data_dic[op] = op_data_dic1[op]
     if 'template' in opt.mid_data_dir:
         fname = opt.data_dir + "_template" + "/" + dir + "/serverlog"
         data1 = get_all_plans(fname)
 
         [get_func_input_data(op_data_dic1, data) for data in
          random.sample(data1, max(len(data1), int(pattern_num.findall(opt.mid_data_dir)[-1])))]
-         # data1[:int(pattern_num.findall(opt.mid_data_dir)[-1])]]
 
         for op in op_data_dic.keys():
             if op not in op_data_dic1.keys():
@@ -118,8 +78,6 @@ def cost_factor_one2one(opt, dir, temp_data, test_size):
     linear = linear1(op_data_dic)
 
     [add_cost_factor(data, linear) for data in temp_data]
-    # train_data = temp_data[test_size:]
-    # test_data = temp_data[:test_size]
 
     return temp_data
 
