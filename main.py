@@ -16,11 +16,11 @@ dstype_type_dict = {
 }
 
 data_dir_dict = {
-    'TPCH': './res_by_dir/tpch',
-    'Sysbench': './res_by_dir/sysbench',
-    'job-light': './res_by_dir/job',
-    'TPCH_transfer': './res_by_dir/tpch_transfer',
-    'job-light_transfer': './res_by_dir/job_transfer',
+    'TPCH': './data_dir/tpch',
+    'Sysbench': './data_dir/sysbench',
+    'job-light': './data_dir/job',
+    'TPCH_transfer': './data_dir/tpch_transfer',
+    'job-light_transfer': './data_dir/job_transfer',
 }
 
 start_epoch = {

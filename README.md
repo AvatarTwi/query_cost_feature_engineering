@@ -8,7 +8,7 @@ QCFE is a feature engineering for query cost estimation to improve the time-accu
 
 - `build_template/*`: build template queries of TPCH and job-light
 - `dataset/`
-  - `postgres_tpch_dataset/*`: 
+  - `postgres_tpch_dataset/*`
     - `cost_factor/`: calculate snapshot
     - `attr_rel_dict.py`: the data abstract of TPCH
     - `attr_val_dict.pickle`: including the min, max, and med values of each attribute in TPCH
@@ -16,7 +16,8 @@ QCFE is a feature engineering for query cost estimation to improve the time-accu
     - `tpch_utils_origin.py`: generate a dataset without feature snapshot for QPPNet
     - `tpch_utils_serialize_knob.py`: generate a dataset with feature snapshot for MSCN
     - `tpch_utils_serialize.py`: generate a dataset without feature snapshot for MSCN
-  - ... : other workloads, similar to `postgres_tpch_dataset`
+  - ...: other workloads, similar to `postgres_tpch_dataset`
+- `data_dir/`: place data
 - `greedy/`: define the greedy method in feature reduction 
 - `models/`: define two models, QPPNet and MSCN.
 - `utils/`: utils for experiments
@@ -41,7 +42,7 @@ The main script used for running experiments is `main.py`. It can be invoked usi
 python main.py --scale <scale> --benchmark <benchmark> --model <model> --type <type>
 ```
 
-where `<scale>` is the sampling scale of labeled data, and `<benchmark>` is the benchmark used in the experiment, which must be TPCH, Sysbench, or job-light. `<model>` is qppnet or mscn. `<type>` is the type of experiment.
+where `<scale>` is the sampling scale of labeled data, and `<benchmark>` is the benchmark used in the experiment, which must be TPCH, Sysbench, or job-light. `<model>` is QPPNet or MSCN. `<type>` is the type of .
 
 ## Usage Examples
 
