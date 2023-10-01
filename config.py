@@ -1,5 +1,3 @@
-num_per_q = [1, 2, 3, 4]
-
 template_num = 1000
 
 total = 0.0
@@ -35,4 +33,4 @@ cost_factor_dict = {'Seq Scan': 2,
                     'Unique': 2,
                     }
 
-filter_type = ['shap', 'grad', 'R2']
+filter_type = ['shap', 'grad', 'greedy']

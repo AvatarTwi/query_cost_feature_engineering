@@ -14,7 +14,7 @@ from torch.utils.data import dataset, random_split, DataLoader
 from dataset.job_dataset.attr_rel_dict import *
 import pickle
 
-from dataset.job_dataset.cost_factor.cost_factor import cost_factor_main, cost_factor_one2one
+from dataset.job_dataset.cost_factor.cost_factor import cost_factor_one2one
 
 import config
 basics = 3  # get_basics(plan_dict)
@@ -202,7 +202,7 @@ class jobDataset():
             self.test_dataset is the test dataset
         """
         mid_data_dir = opt.mid_data_dir
-        self.num_sample_per_q = int(config.num_per_q[-1] * TRAIN_TEST_SPLIT)
+        self.num_sample_per_q = int(opt.scale * TRAIN_TEST_SPLIT)
 
         if not os.path.exists(mid_data_dir):
             os.makedirs(mid_data_dir)

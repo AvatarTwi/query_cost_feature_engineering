@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from dataset.job_dataset.attr_rel_dict import *
 import pickle
 
-from dataset.job_dataset.cost_factor.cost_factor import cost_factor_main, cost_factor_one2one
+from dataset.job_dataset.cost_factor.cost_factor import cost_factor_one2one
 
 import config
 
@@ -26,27 +26,25 @@ op_data_dic = {}
 TRAIN_TEST_SPLIT = 0.8
 
 
-def job_dim(dic_factor):
-    job_dim_dict = {'Seq Scan': num_rel + max_num_attr * 3 + basics,
-                    'Index Scan': num_index + num_rel + max_num_attr * 3 + basics + 1,
-                    'Index Only Scan': num_index + num_rel + max_num_attr * 3 + basics + 1,
-                    'Bitmap Heap Scan': num_rel + max_num_attr * 3 + basics + 32,
-                    'Bitmap Index Scan': num_index + 3,
-                    'Sort': basics + len(sort_algos) + 32,
-                    'Hash': basics + 1 + 32,
-                    'Hash Join': basics + len(join_types) + len(parent_rel_types) + 32 * 2,
-                    'Merge Join': basics + len(join_types) + len(parent_rel_types) + 32 * 2,
-                    'Aggregate': basics + len(aggreg_strats) + 1 + 32,
-                    'Nested Loop': 32 * 2 + len(join_types) + basics,
-                    'Limit': 32 + basics,
-                    'Subquery Scan': 32 + basics,
-                    'Materialize': 32 + basics,
-                    'Gather Merge': 32 + basics,
-                    'Gather': 32 + basics,
-                    'BitmapAnd': 32 * 2 + basics,
-                    'Memoize': 32 + basics,
-                    }
-    return job_dim_dict
+job_dim_dict = {'Seq Scan': num_rel + max_num_attr * 3 + basics,
+                'Index Scan': num_index + num_rel + max_num_attr * 3 + basics + 1,
+                'Index Only Scan': num_index + num_rel + max_num_attr * 3 + basics + 1,
+                'Bitmap Heap Scan': num_rel + max_num_attr * 3 + basics + 32,
+                'Bitmap Index Scan': num_index + 3,
+                'Sort': basics + len(sort_algos) + 32,
+                'Hash': basics + 1 + 32,
+                'Hash Join': basics + len(join_types) + len(parent_rel_types) + 32 * 2,
+                'Merge Join': basics + len(join_types) + len(parent_rel_types) + 32 * 2,
+                'Aggregate': basics + len(aggreg_strats) + 1 + 32,
+                'Nested Loop': 32 * 2 + len(join_types) + basics,
+                'Limit': 32 + basics,
+                'Subquery Scan': 32 + basics,
+                'Materialize': 32 + basics,
+                'Gather Merge': 32 + basics,
+                'Gather': 32 + basics,
+                'BitmapAnd': 32 * 2 + basics,
+                'Memoize': 32 + basics,
+                }
 
 
 with open('dataset/job_dataset/attr_val_dict.pickle', 'rb') as f:
@@ -221,7 +219,7 @@ class jobDataset():
         """
 
         mid_data_dir = opt.mid_data_dir
-        self.num_sample_per_q = int(config.num_per_q[-1] * TRAIN_TEST_SPLIT)
+        self.num_sample_per_q = int(opt.scale * TRAIN_TEST_SPLIT)
         print(self.num_sample_per_q)
 
         if not os.path.exists(mid_data_dir):
@@ -242,8 +240,6 @@ class jobDataset():
 
             data = []
             datas = {}
-            train_datas = {}
-            test_datas = {}
             all_groups, all_groups_test, all_groups_train = [], [], []
 
             if opt.new_data_structure:
@@ -252,25 +248,12 @@ class jobDataset():
                     for dir in dirs:
                         fname = root + "/" + dir + "/serverlog"
                         temp_data = self.get_all_plans(fname)
-                        # random.shuffle(temp_data)
-
-                        # train_data, test_data = cost_factor_one2one(opt,dir, temp_data,
-                        temp_data = cost_factor_one2one(opt, dir, temp_data,
-                                                        int(config.num_per_q[0] / 5))
+                        temp_data = cost_factor_one2one(opt, dir, temp_data)
 
                         for i in range(self.num_q):
                             if i not in datas.keys():
                                 datas[i] = []
-                                # train_datas[i] = []
-                                # test_datas[i] = []
                             datas[i].extend(temp_data)
-                            # train_datas[i].extend(train_data[i])
-                            # test_datas[i].extend(test_data[i])
-                # 消除数据泄漏
-                # for i, train_data in enumerate(train_datas):
-                #     train_datas[i] = random.sample(train_datas[i], int(config.num_per_q[0] * 4 / 5))
-                #     train_datas[i].extend(test_datas[i])
-                #     datas[i] = train_datas[i]
                 with open(opt.data_structure + '/datas.pickle', 'wb') as f:
                     pickle.dump(datas, f)
             else:

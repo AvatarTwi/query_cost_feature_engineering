@@ -224,7 +224,7 @@ class jobDataset():
             self.test_dataset is the test dataset
         """
         mid_data_dir = opt.mid_data_dir
-        self.num_sample_per_q = int(config.num_per_q[-1] * TRAIN_TEST_SPLIT)
+        self.num_sample_per_q = int(opt.scale * TRAIN_TEST_SPLIT)
 
         if not os.path.exists(mid_data_dir):
             os.makedirs(mid_data_dir)
@@ -252,8 +252,7 @@ class jobDataset():
                     for dir in dirs:
                         fname = root + "/" + dir + "/serverlog"
                         temp_data = self.get_all_plans(fname)
-                        temp_data = cost_factor_one2one(opt, dir, temp_data,
-                                                        int(config.num_per_q[0] / 5))
+                        temp_data = cost_factor_one2one(opt, dir, temp_data)
 
                         for i in range(self.num_q):
                             if i not in datas.keys():

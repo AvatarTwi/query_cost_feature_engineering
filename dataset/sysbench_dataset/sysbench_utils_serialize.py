@@ -14,7 +14,7 @@ from torch.utils.data import dataset, random_split, DataLoader
 from dataset.sysbench_dataset.attr_rel_dict import *
 import pickle
 
-from dataset.sysbench_dataset.cost_factor.cost_factor import cost_factor_main, cost_factor_one2one
+from dataset.sysbench_dataset.cost_factor.cost_factor import cost_factor_one2one
 
 import config
 basics = 3  # get_basics(plan_dict)
@@ -204,7 +204,7 @@ class SysbenchDataset():
             self.test_dataset is the test dataset
         """
         mid_data_dir = opt.mid_data_dir
-        self.num_sample_per_q = int(config.num_per_q[-1] * TRAIN_TEST_SPLIT)
+        self.num_sample_per_q = int(opt.scale * TRAIN_TEST_SPLIT)
 
         if not os.path.exists(mid_data_dir):
             os.makedirs(mid_data_dir)
@@ -361,22 +361,6 @@ class SysbenchDataset():
         return labels_norm, min_val, max_val
 
     def make_dataset(self, join_onehots, predicates, labels):
-        # table_masks = []
-        # table_tensors = []
-        # maxlen_tables = max([len(t) for t in tables])
-        # for table in tables:
-        #     table_tensor = np.vstack(table)
-        #     num_pad = maxlen_tables - table_tensor.shape[0]
-        #     table_mask = np.ones_like(table_tensor).mean(1, keepdims=True)
-        #     table_tensor = np.pad(table_tensor, ((0, num_pad), (0, 0)), 'constant')
-        #     table_mask = np.pad(table_mask, ((0, num_pad), (0, 0)), 'constant')
-        #     table_tensors.append(np.expand_dims(table_tensor, 0))
-        #     table_masks.append(np.expand_dims(table_mask, 0))
-        # table_tensors = np.vstack(table_tensors)
-        # table_tensors = torch.FloatTensor(table_tensors)
-        # table_masks = np.vstack(table_masks)
-        # table_masks = torch.FloatTensor(table_masks)
-
         join_onehot_masks = []
         join_onehot_tensors = []
         for join_onehot in join_onehots:

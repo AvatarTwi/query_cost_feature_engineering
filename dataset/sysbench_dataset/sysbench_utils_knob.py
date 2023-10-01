@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from dataset.sysbench_dataset.attr_rel_dict import *
 import pickle
 
-from dataset.sysbench_dataset.cost_factor.cost_factor import cost_factor_main, cost_factor_one2one
+from dataset.sysbench_dataset.cost_factor.cost_factor import cost_factor_one2one
 
 import config
 basics = 3  # get_basics(plan_dict)
@@ -234,7 +234,7 @@ class SysbenchDataset():
 
         mid_data_dir = opt.mid_data_dir
         print(config.num_per_q)
-        self.num_sample_per_q = int(config.num_per_q[-1] * TRAIN_TEST_SPLIT)
+        self.num_sample_per_q = int(opt.scale * TRAIN_TEST_SPLIT)
 
         if not os.path.exists(mid_data_dir):
             os.makedirs(mid_data_dir)
@@ -254,8 +254,6 @@ class SysbenchDataset():
 
             data = []
             datas = {}
-            train_datas = {}
-            test_datas = {}
             all_groups, all_groups_test,all_groups_train = [], [],[]
 
             if opt.new_data_structure:
@@ -264,17 +262,11 @@ class SysbenchDataset():
                     for dir in dirs:
                         fname = root + "/" + dir + "/serverlog"
                         temp_data = self.get_all_plans(fname)
-                        # random.shuffle(temp_data)
-
-                        # train_data, test_data = cost_factor_one2one(opt,dir, temp_data,
-                        temp_data = cost_factor_one2one(opt, dir, temp_data,
-                                                        int(config.num_per_q[0] / 5))
+                        temp_data = cost_factor_one2one(opt, dir, temp_data)
 
                         for i in range(self.num_q):
                             if i not in datas.keys():
                                 datas[i] = []
-                                # train_datas[i] = []
-                                # test_datas[i] = []
                             datas[i].extend(temp_data)
                 with open(opt.data_structure + '/datas.pickle', 'wb') as f:
                     pickle.dump(datas, f)
@@ -463,8 +455,6 @@ class SysbenchDataset():
                 counter += 1
                 enum.append(idx)
                 string_hash.append(string)
-        # print(f"{counter} distinct templates identified")
-        # print(f"Operators: {string_hash}")
         assert (counter > 0)
         return enum, counter
 

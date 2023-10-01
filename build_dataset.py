@@ -15,7 +15,7 @@ from dataset.sysbench_dataset.sysbench_utils_knob import SysbenchDataset as Sysb
 from dataset.sysbench_dataset.sysbench_utils_serialize import SysbenchDataset as SysbenchDataset_serialize
 from dataset.sysbench_dataset.sysbench_utils_serialize_knob import SysbenchDataset as SysbenchDataset_knob_serialize
 
-from dataset.job_dataset.job_utils_origin import jobDataset as jobDataset_origin,job_dim as origin_job_dim
+from dataset.job_dataset.job_utils_origin import jobDataset as jobDataset_origin,job_dim_dict as origin_job_dim
 from dataset.job_dataset.job_utils_knob import jobDataset as jobDataset_knob,job_dim as knob_job_dim
 from dataset.job_dataset.job_utils_serialize import jobDataset as jobDataset_serialize
 from dataset.job_dataset.job_utils_serialize_knob import jobDataset as jobDataset_knob_serialize
@@ -88,13 +88,5 @@ def build_ds(opt, mid_data_dir):
     elif "knob_model" in mid_data_dir:
         dataset = DATASET_TYPE[opt.dataset]['dataset']['knob_model'](opt)
         dim_dict = DATASET_TYPE[opt.dataset]['dim_dict']['knob_model'](config.cost_factor_dict)
-
-    elif "pro_model" in mid_data_dir:
-        dataset = DATASET_TYPE[opt.dataset]['dataset']['pro_model'](opt)
-        dim_dict = DATASET_TYPE[opt.dataset]['dim_dict']['pro_model'](config.cost_factor_dict)
-
-    elif mid_data_dir == "mobility_model":
-        dataset = DATASET_TYPE[opt.dataset]['dataset']['mobility_model'](opt)
-        dim_dict = DATASET_TYPE[opt.dataset]['dim_dict']['mobility_model'](config.cost_factor_dict)
 
     return dataset, dim_dict

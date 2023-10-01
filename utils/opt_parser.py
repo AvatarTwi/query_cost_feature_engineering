@@ -4,9 +4,11 @@ import config
 
 
 def getParser(version, dataset, new_ds, new_md, mid_data_dir, data_structure, data_dir, saved_model, mode,
-              knobs="300-300-300",change=False,start_epoch=0,end_epoch=400,batch_size=1024):
+              knobs="300-300-300",change=False,start_epoch=0,end_epoch=400,batch_size=1024,scale=2000):
 
     parser = argparse.ArgumentParser(description='QPPNet Arg Parser')
+
+    parser.add_argument('--scale', type=int, default=scale, help='data structure path')
 
     parser.add_argument('--new_data_structure', action='store_true', default=new_ds, help='new mid data or no')
 
@@ -16,8 +18,6 @@ def getParser(version, dataset, new_ds, new_md, mid_data_dir, data_structure, da
 
     parser.add_argument('--data_structure', type=str, default=data_structure,
                         help='data structure path')
-
-    parser.add_argument('--random_state', type=int, default=2, help='data structure path')
 
     parser.add_argument('--mid_data_dir', type=str, default=mid_data_dir)
 
@@ -60,6 +60,42 @@ def getParser(version, dataset, new_ds, new_md, mid_data_dir, data_structure, da
                         help='Dir to save model weights (default: ./saved_model)')
 
     parser.add_argument('-logf', '--logfile', type=str, default='train_loss.txt')
+
+    parser.add_argument('--benchmark', type=str, default='tpch', help='data structure path')
+
+    parser.add_argument('--model', type=str, default='QPPNet', help='data structure path')
+
+    parser.add_argument('--mid_dir', type=str, default='origin_model', help='data structure path')
+
+
+    return parser
+
+
+def defaultParser():
+
+    parser = argparse.ArgumentParser(description='QPPNet Arg Parser')
+
+    # 2000,4000,6000,8000,10000
+    parser.add_argument('--scale', type=int, default=2000, help='data structure path')
+
+    # 'tpch','sysbench','job'
+    parser.add_argument('--benchmark', type=str, default='job', help='data structure path')
+
+    # "QPPNet","MSCN"
+    parser.add_argument('--model', type=str, default='QPPNet', help='data structure path')
+
+    # "origin_model",
+    # "knob_model",
+    # "knob_modeltransfer",
+    # "knob_modeltransfer_template",
+    # "knob_model_shap",
+    # "knob_model_grad",
+    # 'knob_model_greedy',
+    # 'knob_modeltemplate' + str(template_num * 1),
+    # 'knob_modeltemplate' + str(template_num * 2),
+    # 'knob_modeltemplate' + str(template_num * 3),
+    # 'knob_modeltemplate' + str(template_num * 4),
+    parser.add_argument('--mid_dir', type=str, default='origin_model', help='data structure path')
 
     return parser
 

@@ -9,7 +9,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from dataset.postgres_tpch_dataset.attr_rel_dict import *
-from dataset.postgres_tpch_dataset.cost_factor.cost_factor import cost_factor_main, cost_factor_one2one
+from dataset.postgres_tpch_dataset.cost_factor.cost_factor import cost_factor_one2one
 import config
 
 basics = 3  # get_basics(plan_dict)
@@ -225,7 +225,7 @@ class PSQLTPCHDataSet():
 
         mid_data_dir = opt.mid_data_dir
 
-        self.num_sample_per_q = int(config.num_per_q[0] * TRAIN_TEST_SPLIT)
+        self.num_sample_per_q = int(int(opt.scale/22) * TRAIN_TEST_SPLIT)
 
         if not os.path.exists(mid_data_dir):
             os.makedirs(mid_data_dir)
@@ -264,8 +264,7 @@ class PSQLTPCHDataSet():
                             temp_data.append(data1)
 
                         # train_data, test_data = cost_factor_one2one(opt, dir, temp_data,
-                        temp_data = cost_factor_one2one(opt, dir, temp_data,
-                                                        max(1, int(config.num_per_q[0] / (20 * 5))))
+                        temp_data = cost_factor_one2one(opt, dir, temp_data)
 
                         for i in range(self.num_q):
                             if i not in datas.keys():
@@ -277,8 +276,8 @@ class PSQLTPCHDataSet():
                             # test_datas[i].extend(test_data[i])
                 # 消除数据泄漏
                 # for i, train_data in enumerate(train_datas):
-                #     train_datas[i] = random.sample(train_datas[i], int(config.num_per_q[0] * 4 / 5))
-                #     test_datas[i] = random.sample(test_datas[i], int(config.num_per_q[0] / 5))
+                #     train_datas[i] = random.sample(train_datas[i], int(opt.scale * 4 / 5))
+                #     test_datas[i] = random.sample(test_datas[i], int(opt.scale / 5))
                 #     train_datas[i].extend(test_datas[i])
                 #     datas[i] = train_datas[i]
                 with open(opt.data_structure + '/datas.pickle', 'wb') as f:

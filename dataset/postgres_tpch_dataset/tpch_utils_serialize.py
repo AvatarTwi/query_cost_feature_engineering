@@ -14,7 +14,7 @@ import config
 from dataset.postgres_tpch_dataset.attr_rel_dict import *
 import pickle
 
-from dataset.postgres_tpch_dataset.cost_factor.cost_factor import cost_factor_main, cost_factor_one2one
+from dataset.postgres_tpch_dataset.cost_factor.cost_factor import cost_factor_one2one
 
 num_rel = 8
 max_num_attr = 16
@@ -199,7 +199,7 @@ class PSQLTPCHDataSet():
         """
 
         mid_data_dir = opt.mid_data_dir
-        self.num_sample_per_q = int(config.num_per_q[0] * TRAIN_TEST_SPLIT)
+        self.num_sample_per_q = int(int(opt.scale/22) * TRAIN_TEST_SPLIT)
 
         if not os.path.exists(mid_data_dir):
             os.makedirs(mid_data_dir)
@@ -282,7 +282,6 @@ class PSQLTPCHDataSet():
                 self.total_time.extend(new_samp_dict["total_time"])
                 self.total_cost.extend(new_samp_dict["total_cost"])
 
-            # self.align_table()
             self.align()
             self.total_time, min_val, max_val = self.normalize_labels(self.total_time)
 

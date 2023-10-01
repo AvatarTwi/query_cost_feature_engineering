@@ -6,10 +6,8 @@ import progressbar
 import torch
 
 import config
-from models.GBDT import GradientBoosting
 from models.MSCN import MSCNModel
 from models.QPPNet import QPPNet
-from models.RandomForest import RandomForest
 from utils.opt_parser import save_opt
 from utils.util import Utils
 
@@ -17,8 +15,6 @@ from utils.util import Utils
 def build_md(dataset, model_type, opt, dim_dict):
     models = {
         "QPPNet": QPPNet,
-        "RandomForest": RandomForest,
-        "GradientBoosting": GradientBoosting,
         "MSCN": MSCNModel,
     }
 
@@ -41,7 +37,7 @@ def build_md(dataset, model_type, opt, dim_dict):
     FUNCTION = {
         "shap_eval": model.calculate_shap,
         "grad_eval": model.calculate_shap,
-        "R2_eval": model.calculate_R2,
+        "greedy_eval": model.calculate_greedy,
     }
 
     total_iter = 0

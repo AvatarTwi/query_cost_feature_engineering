@@ -12,8 +12,8 @@ from torch.autograd import Variable
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader, dataset
 
-from R2.deepMSCN import DeepR2
-from R2.tree import TreeR2
+from greedy.deepMSCN import DeepR2
+from greedy.tree import TreeR2
 from utils import metric
 from utils.util import get_time
 
@@ -97,10 +97,10 @@ class MSCNModel():
         filter_type = opt.mid_data_dir.split("_")[-1]
 
         self.filter = True if "knob_model_" in opt.mid_data_dir else False
-        if os.path.exists("./2200-2000-2000-2000/" + opt.data_dir.split("/")[-1] + "/knob_model/save_model_MSCN/"
+        if os.path.exists("./2000/" + opt.data_dir.split("/")[-1] + "/knob_model/save_model_MSCN/"
                           + str(opt.batch_size) + "/" + filter_type + "_values_array.pickle"):
 
-            with open("./2200-2000-2000-2000/" + opt.data_dir.split("/")[-1] + "/knob_model/save_model_MSCN/"
+            with open("./2000/" + opt.data_dir.split("/")[-1] + "/knob_model/save_model_MSCN/"
                       + str(opt.batch_size) + "/" + filter_type + "_values_array.pickle", "rb") as f:
                 self.save_values_array = pickle.load(f)
 
@@ -300,8 +300,6 @@ class MSCNModel():
         self.save = True
         self.model_train(0)
 
-        # filter_type = 'Tree'
-        # filter_type = 'shap'
         filter_type = 'grad'
 
         if 'Tree' == filter_type:
@@ -341,9 +339,7 @@ class MSCNModel():
         elif filter_type == 'shap':
             explainer = shap.DeepExplainer(filter_models, trainX)
         elif filter_type == 'grad':
-            print('grad')
             explainer = shap.GradientExplainer(filter_models, trainX)
-        exit(1)
 
         shap_values = explainer.shap_values(data)
         n_array = np.array(shap_values)
@@ -382,7 +378,7 @@ class MSCNModel():
         with open(self.save_dir + "/" + filter_type + "_values_array.pickle", "wb") as f:
             pickle.dump(shap_values_array, f)
 
-    def calculate_R2(self, eval_dataset):
+    def calculate_greedy(self, eval_dataset):
 
         self.test = True
         self.input = eval_dataset
@@ -427,7 +423,7 @@ class MSCNModel():
         R2_values_array = np.array(R2.filter_values)
         print(R2_values_array.shape)
 
-        with open(self.save_dir + "/R2_values_array.pickle", "wb") as f:
+        with open(self.save_dir + "/greedy_values_array.pickle", "wb") as f:
             pickle.dump(R2_values_array, f)
 
     @get_time

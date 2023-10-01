@@ -10,7 +10,7 @@ import config
 from dataset.postgres_tpch_dataset.attr_rel_dict import *
 import pickle
 
-from dataset.postgres_tpch_dataset.cost_factor.cost_factor import cost_factor_main, cost_factor_one2one
+from dataset.postgres_tpch_dataset.cost_factor.cost_factor import cost_factor_one2one
 
 num_rel = 8
 max_num_attr = 16
@@ -206,7 +206,7 @@ class PSQLTPCHDataSet():
         """
 
         mid_data_dir = opt.mid_data_dir
-        self.num_sample_per_q = int(config.num_per_q[0] * TRAIN_TEST_SPLIT)
+        self.num_sample_per_q = int(int(opt.scale/22) * TRAIN_TEST_SPLIT)
 
         if not os.path.exists(mid_data_dir):
             os.makedirs(mid_data_dir)
@@ -226,12 +226,9 @@ class PSQLTPCHDataSet():
 
             data = []
             datas = {}
-            train_datas = {}
-            test_datas = {}
             all_groups, all_groups_test, all_groups_train = [], [], []
 
             if opt.new_data_structure:
-                # random.seed(1)
                 for root, dirs, files in os.walk(opt.data_dir):
                     for dir in dirs:
                         temp_data = []
@@ -239,29 +236,14 @@ class PSQLTPCHDataSet():
                             fname = root + "/" + dir + "/q" + str(i + 1) + ".json"
                             data1 = self.get_all_plans(fname)
 
-                            # 消除数据泄漏
-                            # random.shuffle(data1)
-
                             temp_data.append(data1)
 
-                        # train_data, test_data = cost_factor_one2one(opt, dir, temp_data,
-                        temp_data = cost_factor_one2one(opt, dir, temp_data,
-                                                                    max(1, int(config.num_per_q[0] / (20 * 5))))
+                        temp_data = cost_factor_one2one(opt, dir, temp_data)
 
                         for i in range(self.num_q):
                             if i not in datas.keys():
                                 datas[i] = []
-                                # train_datas[i] = []
-                                # test_datas[i] = []
                             datas[i].extend(temp_data[i])
-                            # train_datas[i].extend(train_data[i])
-                            # test_datas[i].extend(test_data[i])
-                # 消除数据泄漏
-                # for i, train_data in enumerate(train_datas):
-                #     train_datas[i] = random.sample(train_datas[i], int(config.num_per_q[0] * 4 / 5))
-                #     test_datas[i] = random.sample(test_datas[i], int(config.num_per_q[0] / 5))
-                #     train_datas[i].extend(test_datas[i])
-                #     datas[i] = train_datas[i]
                 with open(opt.data_structure + '/datas.pickle', 'wb') as f:
                     pickle.dump(datas, f)
             else:
@@ -282,11 +264,6 @@ class PSQLTPCHDataSet():
                 TrainEnum, testEnum, TrainTempdata, testTempdata = \
                     train_test_split(enum, temp_data, train_size=int(self.num_sample_per_q),
                                      test_size=int(self.num_sample_per_q / 4), random_state=1)
-                # TrainEnum = enum[:int(TRAIN_TEST_SPLIT * len(enum))]
-                # testEnum = enum[int(TRAIN_TEST_SPLIT * len(enum)):]
-                # TrainTempdata = temp_data[:int(TRAIN_TEST_SPLIT * len(enum))]
-                # testTempdata = temp_data[int(TRAIN_TEST_SPLIT * len(enum)):]
-
                 self.grp_idxes += TrainEnum
                 self.num_grps[i] = num_grp
                 data += TrainTempdata

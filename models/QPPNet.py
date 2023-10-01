@@ -14,8 +14,8 @@ from sklearn.model_selection import train_test_split
 from torch.optim import lr_scheduler
 from pyDOE import lhs
 
-from R2.deepNN import DeepR2
-from R2.tree import TreeR2
+from greedy.deepNN import DeepR2
+from greedy.tree import TreeR2
 from config import filter_type
 from utils.util import get_time
 from utils.metric import Metric
@@ -110,17 +110,18 @@ class QPPNet():
             self.filter_type = opt.mode.replace("_eval", "")
         else:
             self.filter_type = opt.mid_data_dir.split("_")[-1]
+
         print(self.filter_type)
         self.filter = True if "knob_model_" in opt.mid_data_dir else False
 
-        print("./2200-2000-2000-2000/" + opt.data_dir.split("/")[-1].split("_")[0] + "/knob_model/save_model_QPPNet/"
+        print("./2000/" + opt.data_dir.split("/")[-1].split("_")[0] + "/knob_model/save_model_QPPNet/"
               + str(opt.batch_size) + "/" + self.filter_type + "_values_array.pickle")
 
         if os.path.exists(
-                "./2200-2000-2000-2000/" + opt.data_dir.split("/")[-1].split("_")[0] + "/knob_model/save_model_QPPNet/"
+                "./2000/" + opt.data_dir.split("/")[-1].split("_")[0] + "/knob_model/save_model_QPPNet/"
                 + str(opt.batch_size) + "/" + self.filter_type + "_values_array.pickle"):
 
-            with open("./2200-2000-2000-2000/" + opt.data_dir.split("/")[-1].split("_")[
+            with open("./2000/" + opt.data_dir.split("/")[-1].split("_")[
                 0] + "/knob_model/save_model_QPPNet/"
                       + str(opt.batch_size) + "/" + self.filter_type + "_values_array.pickle", "rb") as f:
                 self.save_values_array = pickle.load(f)
@@ -469,8 +470,8 @@ class QPPNet():
             if self.save_X[operator] == []:
                 continue
 
-            back_samp = np.random.choice(len(self.save_X[operator]), size=1200, replace=True)
-            data_samp = np.random.choice(len(self.save_X[operator]), size=400, replace=True)
+            back_samp = np.random.choice(len(self.save_X[operator]), size=100, replace=True)
+            data_samp = np.random.choice(len(self.save_X[operator]), size=25, replace=True)
             background_data = np.array(self.save_X[operator])[back_samp]
             data = np.array(self.save_X[operator])[data_samp]
 
@@ -532,7 +533,7 @@ class QPPNet():
 
         return shap_values_array
 
-    def calculate_R2(self, eval_dataset):
+    def calculate_greedy(self, eval_dataset):
 
         self.save_X = {}
         self.save_y = {}
@@ -596,7 +597,7 @@ class QPPNet():
 
             print(R2_values_array[operator].shape)
 
-            with open(self.save_dir + "/R2_values_array.pickle", "wb") as f:
+            with open(self.save_dir + "/greedy_values_array.pickle", "wb") as f:
                 pickle.dump(R2_values_array, f)
 
         return R2_values_array
