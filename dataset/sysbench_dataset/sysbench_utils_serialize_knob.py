@@ -14,7 +14,7 @@ from torch.utils.data import dataset, random_split, DataLoader
 from dataset.sysbench_dataset.attr_rel_dict import *
 import pickle
 
-from dataset.sysbench_dataset.cost_factor.cost_factor import cost_factor_one2one
+from dataset.sysbench_dataset.snapshot.snapshot import cost_factor_one2one
 
 import config
 basics = 3  # get_basics(plan_dict)

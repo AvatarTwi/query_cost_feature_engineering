@@ -10,38 +10,40 @@ from utils.util import Utils
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 dstype_type_dict = {
-    'tpch': 'PSQLTPCH',
-    'sysbench': 'PSQLSysbench',
-    'job': 'PSQLJOB',
+    'TPCH': 'PSQLTPCH',
+    'Sysbench': 'PSQLSysbench',
+    'job-light': 'PSQLJOB',
 }
 
 data_dir_dict = {
-    'tpch': 'tpch',
-    'sysbench': 'sysbench',
-    'job': 'job',
-    'tpch_transfer': 'tpch_transfer',
-    'job_transfer': 'job_transfer',
+    'TPCH': './res_by_dir/tpch',
+    'Sysbench': './res_by_dir/sysbench',
+    'job-light': './res_by_dir/job',
+    'TPCH_transfer': './res_by_dir/tpch_transfer',
+    'job-light_transfer': './res_by_dir/job_transfer',
 }
 
 start_epoch = {
-    'tpch': 0,
-    'sysbench': 0,
-    'job': 0,
+    'TPCH': 0,
+    'Sysbench': 0,
+    'job-light': 0,
 }
 
 end_epoch = {
-    'tpch': 400,
-    'sysbench': 100,
-    'job': 800,
+    'TPCH': 400,
+    'Sysbench': 100,
+    'job-light': 800,
 }
 
 if __name__ == '__main__':
 
     opt = defaultParser().parse_args()
-    benchmark_type = opt.benchmark
+    benchmark_type = opt.workload
+    if benchmark_type == 'qcfe':
+        benchmark_type = 'knob_model_shap'
     model_type = opt.model
-    model = opt.mid_dir
-    version = str(opt.scale) + "/" + opt.benchmark
+    model = opt.type
+    version = str(opt.scale) + "/" + benchmark_type
 
     Utils.path_build("./" + version)
     new_md = True if model_type == 'QPPNet' or model_type == 'MSCN' else False
@@ -56,6 +58,21 @@ if __name__ == '__main__':
                 version_sp = version
             else:
                 version_sp = "2000/" + benchmark_type
+
+            if not os.path.exists("./2000/" + benchmark_type + '/knob_model/save_model_' + model_type):
+                opt = getParser(version=version_sp,
+                                dataset=dstype_type_dict[benchmark_type],
+                                new_ds=False, new_md=False,
+                                mid_data_dir='./' + version_sp + '/knob_model',
+                                data_structure='./' + version_sp + '/data_structure',
+                                data_dir=data_dir_dict[benchmark_type],
+                                saved_model='/save_model_' + model_type,
+                                mode='train',
+                                start_epoch=start_epoch[benchmark_type],
+                                end_epoch=end_epoch[benchmark_type],
+                                scale=opt.scale).parse_args()
+                dataset, dim_dict = build_ds(opt, 'knob_model')
+                build_md(dataset, model_type, opt, dim_dict)
 
             opt = getParser(version=version_sp,
                             dataset=dstype_type_dict[benchmark_type],
@@ -117,7 +134,7 @@ if __name__ == '__main__':
                         new_md=new_md,
                         mid_data_dir='./' + version + '/' + model,
                         data_structure='./' + version + '/data_structure' + model.replace(
-                            "knob_model", "").replace("origin_model", "").replace("pro_model", ""),
+                            "knob_model", "").replace("origin_model", ""),
                         data_dir=data_dir_dict[benchmark_type],
                         saved_model='/save_model_' + model_type,
                         mode='train',

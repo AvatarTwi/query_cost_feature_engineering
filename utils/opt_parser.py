@@ -8,11 +8,9 @@ def getParser(version, dataset, new_ds, new_md, mid_data_dir, data_structure, da
 
     parser = argparse.ArgumentParser(description='QPPNet Arg Parser')
 
-    parser.add_argument('--scale', type=int, default=scale, help='data structure path')
+    parser.add_argument('--new_data_structure', action='store_true', default=new_ds, help='new datastruct or no')
 
-    parser.add_argument('--new_data_structure', action='store_true', default=new_ds, help='new mid data or no')
-
-    parser.add_argument('--new_mid_data', action='store_true', default=new_md, help='new mid data or no')  # 是否更新中间数据
+    parser.add_argument('--new_mid_data', action='store_true', default=new_md, help='new mid data or no')
 
     parser.add_argument('--change', action='store_true', default=change, help='change or no')
 
@@ -25,12 +23,12 @@ def getParser(version, dataset, new_ds, new_md, mid_data_dir, data_structure, da
 
     parser.add_argument('--version', type=str, default=version)
 
-    parser.add_argument('--mode', type=str, default=mode, help='train/test/part_train')  # 是否测试
+    parser.add_argument('--mode', type=str, default=mode, help='train/test/part_train')
 
     parser.add_argument('--batch_size', type=int, default=batch_size,
                         help='Batch size used in training (default: 128)')
 
-    parser.add_argument('--data_dir', type=str, default='./res_by_dir/' + data_dir, help='Dir containing train data')
+    parser.add_argument('--data_dir', type=str, default=data_dir, help='Dir containing collected data')
 
     parser.add_argument('--dataset', type=str, default=dataset,
                         help='Select dataset [PSQLTPCH | TerrierTPCH | OLTP]')
@@ -61,11 +59,13 @@ def getParser(version, dataset, new_ds, new_md, mid_data_dir, data_structure, da
 
     parser.add_argument('-logf', '--logfile', type=str, default='train_loss.txt')
 
-    parser.add_argument('--benchmark', type=str, default='tpch', help='data structure path')
+    parser.add_argument('--scale', type=int, default=scale)
 
-    parser.add_argument('--model', type=str, default='QPPNet', help='data structure path')
+    parser.add_argument('--benchmark', type=str, default='tpch')
 
-    parser.add_argument('--mid_dir', type=str, default='origin_model', help='data structure path')
+    parser.add_argument('--model', type=str, default='QPPNet')
+
+    parser.add_argument('--type', type=str, default='origin_model')
 
 
     return parser
@@ -76,26 +76,23 @@ def defaultParser():
     parser = argparse.ArgumentParser(description='QPPNet Arg Parser')
 
     # 2000,4000,6000,8000,10000
-    parser.add_argument('--scale', type=int, default=2000, help='data structure path')
+    parser.add_argument('--scale', type=int, default=2000, help='data scale')
 
     # 'tpch','sysbench','job'
-    parser.add_argument('--benchmark', type=str, default='job', help='data structure path')
+    parser.add_argument('--workload', type=str, default='job', help='benchmark')
 
     # "QPPNet","MSCN"
-    parser.add_argument('--model', type=str, default='QPPNet', help='data structure path')
+    parser.add_argument('--model', type=str, default='QPPNet', help='qppnet or mscn')
 
     # "origin_model",
     # "knob_model",
     # "knob_modeltransfer",
     # "knob_modeltransfer_template",
-    # "knob_model_shap",
+    # "knob_model_shap", or "qcfe",
     # "knob_model_grad",
     # 'knob_model_greedy',
-    # 'knob_modeltemplate' + str(template_num * 1),
-    # 'knob_modeltemplate' + str(template_num * 2),
-    # 'knob_modeltemplate' + str(template_num * 3),
-    # 'knob_modeltemplate' + str(template_num * 4),
-    parser.add_argument('--mid_dir', type=str, default='origin_model', help='data structure path')
+    # 'knob_modeltemplate' + str(template_num),
+    parser.add_argument('--type', type=str, default='origin_model', help='mid dir path')
 
     return parser
 

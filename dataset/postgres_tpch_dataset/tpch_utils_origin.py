@@ -10,7 +10,7 @@ import config
 from dataset.postgres_tpch_dataset.attr_rel_dict import *
 import pickle
 
-from dataset.postgres_tpch_dataset.cost_factor.cost_factor import cost_factor_one2one
+from dataset.postgres_tpch_dataset.snapshot.snapshot import cost_factor_one2one
 
 num_rel = 8
 max_num_attr = 16

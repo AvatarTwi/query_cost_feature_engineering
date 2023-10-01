@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from dataset.job_dataset.attr_rel_dict import *
 import pickle
 
-from dataset.job_dataset.cost_factor.cost_factor import cost_factor_one2one
+from dataset.job_dataset.snapshot.snapshot import cost_factor_one2one
 
 import config
 

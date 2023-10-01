@@ -1,12 +1,4 @@
-template_num = 1000
-
 total = 0.0
-
-
-def set_per_qs(new):
-    global num_per_q
-    num_per_q = new
-
 
 cost_factor_dict = {'Seq Scan': 2,
                     'Index Scan': 2,

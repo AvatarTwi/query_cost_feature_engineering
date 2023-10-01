@@ -4,12 +4,11 @@ import pickle
 import random
 import re
 
-from dataset.sysbench_dataset.cost_factor.cost_factor_linear import linear1
+from dataset.sysbench_dataset.snapshot.snapshot_linear import linear1
 
 
 def get_all_plans(fname):
     jss = []
-    print(fname)
 
     with open(fname, "r", encoding='utf-8') as f:
         lines = [line for line in f.readlines()]
@@ -29,34 +28,6 @@ def get_all_plans(fname):
                     plan_obj = json.loads(s=''.join(plan_strs))
                     jss.append(plan_obj['Plan'])
 
-    return jss
-
-
-def get_all_plans_sp(fname):
-    jsonstrs = []
-    curr = ""
-    prev = None
-    prevprev = None
-
-    with open(fname, 'r', encoding='utf-8') as f:
-        for row in f:
-            if not ('[' in row or '{' in row or ']' in row or '}' in row or ':' in row):
-                continue
-            newrow = row.replace('+', "").replace("(1 row)\n", "").strip('\n').strip(' ')
-
-            if 'CREATE' not in newrow and 'DROP' not in newrow and 'Tim' != newrow[:3]:
-                curr += newrow
-
-            if prevprev is not None and 'Execution Time' in prevprev:
-                jsonstrs.append(curr.strip(' ').strip('QUERY PLAN').strip('-'))
-                curr = ""
-            prevprev = prev
-            prev = newrow
-
-    strings = [s for s in jsonstrs if s[-1] == ']']
-    jss = [json.loads(s)[0]['Plan'] for s in strings]
-
-    # jss is a list of json-transformed dicts, one for each query
     return jss
 
 
@@ -91,12 +62,11 @@ def cost_factor_one2one(opt, dir, temp_data):
     [get_func_input_data(op_data_dic, data) for data in temp_data]
 
     if 'template' in opt.mid_data_dir:
-        fname = opt.data_dir + "_template" + "/" + dir + "/q1.json"
-        data1 = get_all_plans_sp(fname)
+        fname = opt.data_dir + "_template" + "/" + dir + "/serverlog"
+        data1 = get_all_plans(fname)
 
-        random.seed(4)
         [get_func_input_data(op_data_dic1, data) for data in
-         random.sample(data1, min(len(data1), int(pattern_num.findall(opt.mid_data_dir)[-1])))]
+         random.sample(data1, max(len(data1), int(pattern_num.findall(opt.mid_data_dir)[-1])))]
 
         for op in op_data_dic.keys():
             if op not in op_data_dic1.keys():
