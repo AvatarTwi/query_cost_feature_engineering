@@ -96,11 +96,11 @@ class MSCNModel():
 
         filter_type = opt.mid_data_dir.split("_")[-1]
 
-        self.filter = True if "knob_model_" in opt.mid_data_dir else False
-        if os.path.exists("./2000/" + opt.data_dir.split("/")[-1] + "/knob_model/save_model_MSCN/"
+        self.filter = True if "snapshot_model_" in opt.mid_data_dir else False
+        if os.path.exists("./2000/" + opt.mid_data_dir.split("/")[-2] + "/snapshot_model/save_model_MSCN/"
                           + str(opt.batch_size) + "/" + filter_type + "_values_array.pickle"):
 
-            with open("./2000/" + opt.data_dir.split("/")[-1] + "/knob_model/save_model_MSCN/"
+            with open("./2000/" + opt.mid_data_dir.split("/")[-2] + "/snapshot_model/save_model_MSCN/"
                       + str(opt.batch_size) + "/" + filter_type + "_values_array.pickle", "rb") as f:
                 self.save_values_array = pickle.load(f)
 
@@ -292,7 +292,7 @@ class MSCNModel():
         else:
             torch.save(self.model.cpu().state_dict(), save_path)
 
-    def calculate_shap(self, eval_dataset):
+    def calculate_FR(self, eval_dataset):
 
         self.test = True
         self.input = eval_dataset
@@ -378,7 +378,7 @@ class MSCNModel():
         with open(self.save_dir + "/" + filter_type + "_values_array.pickle", "wb") as f:
             pickle.dump(shap_values_array, f)
 
-    def calculate_greedy(self, eval_dataset):
+    def calculate_GREEDY(self, eval_dataset):
 
         self.test = True
         self.input = eval_dataset
@@ -420,11 +420,11 @@ class MSCNModel():
             R2 = DeepR2(filter_models, TrainX, TrainY,
                         self.dim_dict["table_list_len"], self.dim_dict["maxlen_plan"])
 
-        R2_values_array = np.array(R2.filter_values)
-        print(R2_values_array.shape)
+        GREEDY_values_array = np.array(R2.filter_values)
+        print(GREEDY_values_array.shape)
 
         with open(self.save_dir + "/greedy_values_array.pickle", "wb") as f:
-            pickle.dump(R2_values_array, f)
+            pickle.dump(GREEDY_values_array, f)
 
     @get_time
     def filterfunc(self, input_vec):

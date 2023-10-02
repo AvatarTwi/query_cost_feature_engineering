@@ -1,7 +1,5 @@
 import os
 
-import config
-from config import *
 from build_dataset import build_ds
 from build_model import build_md
 from utils.opt_parser import getParser, defaultParser
@@ -36,34 +34,30 @@ end_epoch = {
 }
 
 if __name__ == '__main__':
-
     opt = defaultParser().parse_args()
     benchmark_type = opt.workload
-    if benchmark_type == 'qcfe':
-        benchmark_type = 'knob_model_shap'
     model_type = opt.model
     model = opt.type
     version = str(opt.scale) + "/" + benchmark_type
 
     Utils.path_build("./" + version)
-    new_md = True if model_type == 'QPPNet' or model_type == 'MSCN' else False
 
-    if 'knob_model_' in model:
+    if 'snapshot_model_' in model:
 
-        filter_type = model.replace("knob_model_", "")
+        filter_type = model.replace("snapshot_model_", "")
 
         for i in range(2):
-            if os.path.exists("./2000/" + benchmark_type + '/knob_model/save_model_'
+            if os.path.exists("./2000/" + benchmark_type + '/snapshot_model/save_model_'
                               + model_type + "/1024/" + filter_type + "_values_array.pickle"):
                 version_sp = version
             else:
                 version_sp = "2000/" + benchmark_type
 
-            if not os.path.exists("./2000/" + benchmark_type + '/knob_model/save_model_' + model_type):
+            if not os.path.exists("./2000/" + benchmark_type + '/snapshot_model/save_model_' + model_type):
                 opt = getParser(version=version_sp,
                                 dataset=dstype_type_dict[benchmark_type],
                                 new_ds=False, new_md=False,
-                                mid_data_dir='./' + version_sp + '/knob_model',
+                                mid_data_dir='./' + version_sp + '/snapshot_model',
                                 data_structure='./' + version_sp + '/data_structure',
                                 data_dir=data_dir_dict[benchmark_type],
                                 saved_model='/save_model_' + model_type,
@@ -71,25 +65,25 @@ if __name__ == '__main__':
                                 start_epoch=start_epoch[benchmark_type],
                                 end_epoch=end_epoch[benchmark_type],
                                 scale=opt.scale).parse_args()
-                dataset, dim_dict = build_ds(opt, 'knob_model')
+                dataset, dim_dict = build_ds(opt, 'snapshot_model')
                 build_md(dataset, model_type, opt, dim_dict)
 
             opt = getParser(version=version_sp,
                             dataset=dstype_type_dict[benchmark_type],
                             new_ds=False, new_md=False,
-                            mid_data_dir='./' + version_sp + '/knob_model',
+                            mid_data_dir='./' + version_sp + '/snapshot_model',
                             data_structure='./' + version_sp + '/data_structure',
                             data_dir=data_dir_dict[benchmark_type],
                             saved_model='/save_model_' + model_type,
                             mode=filter_type + '_eval',
                             scale=opt.scale).parse_args()
 
-            if os.path.exists("./2000/" + benchmark_type + '/knob_model/save_model_'
+            if os.path.exists("./2000/" + benchmark_type + '/snapshot_model/save_model_'
                               + model_type + "/1024/" + filter_type + "_values_array.pickle"):
-                dataset, dim_dict = build_ds(opt, 'knob_model')
+                dataset, dim_dict = build_ds(opt, 'snapshot_model')
                 break
             else:
-                dataset, dim_dict = build_ds(opt, 'knob_model')
+                dataset, dim_dict = build_ds(opt, 'snapshot_model')
                 build_md(dataset, model_type, opt, dim_dict)
 
         opt = getParser(version=version,
@@ -112,11 +106,10 @@ if __name__ == '__main__':
     elif "origin_model" in model:
         opt = getParser(version=version,
                         dataset=dstype_type_dict[benchmark_type],
-                        new_ds=True if model_type == 'QPPNet' else False,
-                        new_md=new_md,
+                        new_ds=False, new_md=False,
                         mid_data_dir='./' + version + '/' + model,
                         data_structure='./' + version + '/data_structure' + model.replace(
-                            "knob_model_template", "").replace("origin_model", ""),
+                            "snapshot_model_template", "").replace("origin_model", ""),
                         data_dir=data_dir_dict[benchmark_type],
                         saved_model='/save_model_' + model_type,
                         mode='train',
@@ -130,11 +123,10 @@ if __name__ == '__main__':
     elif 'transfer' not in model:
         opt = getParser(version=version,
                         dataset=dstype_type_dict[benchmark_type],
-                        new_ds=True if 'template' in model else False,
-                        new_md=new_md,
+                        new_ds=False, new_md=False,
                         mid_data_dir='./' + version + '/' + model,
                         data_structure='./' + version + '/data_structure' + model.replace(
-                            "knob_model", "").replace("origin_model", ""),
+                            "snapshot_model", "").replace("origin_model", ""),
                         data_dir=data_dir_dict[benchmark_type],
                         saved_model='/save_model_' + model_type,
                         mode='train',
@@ -151,7 +143,7 @@ if __name__ == '__main__':
                         new_ds=False, new_md=False,
                         mid_data_dir='./' + version + '/' + model,
                         data_structure='./' + version + '/data_structure_' + model
-                        .replace("knob_model", ""),
+                        .replace("snapshot_model", ""),
                         data_dir=data_dir_dict[benchmark_type + "_transfer"],
                         saved_model='/save_model_' + model_type,
                         mode='change_train',

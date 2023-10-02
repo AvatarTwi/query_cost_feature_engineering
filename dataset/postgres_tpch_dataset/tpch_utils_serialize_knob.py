@@ -199,7 +199,7 @@ class PSQLTPCHDataSet():
         """
 
         mid_data_dir = opt.mid_data_dir
-        self.num_sample_per_q = int(int(opt.scale/22) * TRAIN_TEST_SPLIT)
+        self.num_sample_per_q = int(int(opt.scale/20) * TRAIN_TEST_SPLIT)
 
         if not os.path.exists(mid_data_dir):
             os.makedirs(mid_data_dir)

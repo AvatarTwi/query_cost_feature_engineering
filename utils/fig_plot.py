@@ -312,8 +312,8 @@ plan1 = {
     'name': 'fig1',
     'model': ['origin_model/save_model_QPPNet',
               'origin_model/save_model_MSCN',
-              'knob_model_shap/save_model_QPPNet',
-              'knob_model_shap/save_model_MSCN'],
+              'snapshot_model_FR/save_model_QPPNet',
+              'snapshot_model_FR/save_model_MSCN'],
     'name_align':name_align,
     'sort':sort,
     'func':[fig]

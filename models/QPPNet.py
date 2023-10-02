@@ -76,14 +76,14 @@ class NeuralUnit(nn.Module):
     def freeze(self):
         # To freeze the residual layers
         for param in self.network.parameters():
-            param.require_grad = False
+            param.require_GD = False
         for param in self.network.fc.parameters():
-            param.require_grad = True
+            param.require_GD = True
 
     def unfreeze(self):
         # Unfreeze all layers
         for param in self.network.parameters():
-            param.require_grad = True
+            param.require_GD = True
 
 
 ###############################################################################
@@ -112,17 +112,16 @@ class QPPNet():
             self.filter_type = opt.mid_data_dir.split("_")[-1]
 
         print(self.filter_type)
-        self.filter = True if "knob_model_" in opt.mid_data_dir else False
+        self.filter = True if "snapshot_model_" in opt.mid_data_dir else False
 
-        print("./2000/" + opt.data_dir.split("/")[-1].split("_")[0] + "/knob_model/save_model_QPPNet/"
+        print("./2000/" + opt.mid_data_dir.split("/")[-2] + "/snapshot_model/save_model_QPPNet/"
               + str(opt.batch_size) + "/" + self.filter_type + "_values_array.pickle")
 
         if os.path.exists(
-                "./2000/" + opt.data_dir.split("/")[-1].split("_")[0] + "/knob_model/save_model_QPPNet/"
+                "./2000/" + opt.mid_data_dir.split("/")[-2] + "/snapshot_model/save_model_QPPNet/"
                 + str(opt.batch_size) + "/" + self.filter_type + "_values_array.pickle"):
 
-            with open("./2000/" + opt.data_dir.split("/")[-1].split("_")[
-                0] + "/knob_model/save_model_QPPNet/"
+            with open("./2000/" + opt.mid_data_dir.split("/")[-2] + "/snapshot_model/save_model_QPPNet/"
                       + str(opt.batch_size) + "/" + self.filter_type + "_values_array.pickle", "rb") as f:
                 self.save_values_array = pickle.load(f)
 
@@ -354,13 +353,13 @@ class QPPNet():
         self.total_loss.backward()
         self.total_loss = None
 
-    def backward_gradFalse(self):
+    def backward_GDFalse(self):
         self.last_total_loss = self.total_loss.item()
         if self.best > self.total_loss.item():
             self.best = self.total_loss.item()
             self.save_units('best')
 
-        self.total_loss.requires_grad_(True)
+        self.total_loss.requires_GD_(True)
         self.total_loss.backward()
         self.total_loss = None
 
@@ -397,7 +396,7 @@ class QPPNet():
         for operator in self.optimizers:
             self.optimizers[operator].zero_grad()
 
-        self.backward_gradFalse()
+        self.backward_GDFalse()
 
         for operator in self.optimizers:
             self.optimizers[operator].step()
@@ -431,7 +430,7 @@ class QPPNet():
         with open(self.save_dir + "/plan_times.pickle", "wb") as f:
             pickle.dump(self.plan_times, f)
 
-    def calculate_shap(self, eval_dataset):
+    def calculate_FR(self, eval_dataset):
 
         self.save_X = {}
         self.save_y = {}
@@ -533,7 +532,7 @@ class QPPNet():
 
         return shap_values_array
 
-    def calculate_greedy(self, eval_dataset):
+    def calculate_GREEDY(self, eval_dataset):
 
         self.save_X = {}
         self.save_y = {}
@@ -550,23 +549,23 @@ class QPPNet():
 
         # filter_type = 'Tree'
         filter_type = 'Net'
-        R2_models = {}
+        GREEDY_models = {}
 
         if 'Tree' == filter_type:
             for operator in self.dim_dict:
-                R2_models[operator] = RandomForestRegressor(max_depth=9, n_estimators=50, warm_start=False,
+                GREEDY_models[operator] = RandomForestRegressor(max_depth=9, n_estimators=50, warm_start=False,
                                                             random_state=1)
         else:
-            R2_models = self.units
+            GREEDY_models = self.units
 
         for operator in self.dim_dict:
             if self.save_X[operator] != []:
                 self.save_X[operator] = np.array([item.cpu().detach().numpy() for item in self.save_X[operator]])
                 self.save_y[operator] = np.array(self.save_y[operator])
                 if 'Tree' == filter_type:
-                    R2_models[operator].fit(self.save_X[operator], self.save_y[operator])
+                    GREEDY_models[operator].fit(self.save_X[operator], self.save_y[operator])
 
-        R2_values_array = {}
+        GREEDY_values_array = {}
 
         for operator in self.dim_dict:
             print("calculate " + operator + "'s R2")
@@ -589,18 +588,18 @@ class QPPNet():
             del self.save_X[operator]
 
             if 'Tree' == filter_type:
-                R2 = TreeR2(R2_models[operator], TrainX, TrainY)
+                R2 = TreeR2(GREEDY_models[operator], TrainX, TrainY)
             else:
-                R2 = DeepR2(R2_models[operator], TrainX, TrainY, operator, self.dim_dict)
+                R2 = DeepR2(GREEDY_models[operator], TrainX, TrainY, operator, self.dim_dict)
 
-            R2_values_array[operator] = np.array(R2.filter_values)
+            GREEDY_values_array[operator] = np.array(R2.filter_values)
 
-            print(R2_values_array[operator].shape)
+            print(GREEDY_values_array[operator].shape)
 
             with open(self.save_dir + "/greedy_values_array.pickle", "wb") as f:
-                pickle.dump(R2_values_array, f)
+                pickle.dump(GREEDY_values_array, f)
 
-        return R2_values_array
+        return GREEDY_values_array
 
     def get_current_losses(self):
         return self.curr_losses
@@ -619,7 +618,7 @@ class QPPNet():
     def load_unchange(self, epoch):
         for name in self.units:
             save_filename = '%s_net_%s.pth' % (epoch, name)
-            save_path = os.path.join(self.save_dir.replace("change", "").replace("_template", ""), save_filename)
+            save_path = os.path.join(self.save_dir.replace("transfer", "").replace("_template", ""), save_filename)
             if not os.path.exists(save_path):
                 raise ValueError("model {} doesn't exist".format(save_path))
 

@@ -11,14 +11,14 @@ class TreeR2():
         self.model = model
         self.filter_values = [i for i in range(self.TrainX.shape[1])]
         self.default_eval_value = self.default()
-        self.R2_func()
+        self.GREEDY_func()
 
     def default(self):
         result = self.model.predict(self.TrainX)
         default_eval_value = self.calculate(result, self.TrainY)
         return default_eval_value
 
-    def R2_func(self):
+    def GREEDY_func(self):
         min_col = -1
         self.model = RandomForestRegressor(max_depth=9, n_estimators=50, warm_start=False,
                                            random_state=1)
@@ -33,7 +33,7 @@ class TreeR2():
                 min_col = i
         if min_col != -1:
             self.filter_values.remove(min_col)
-            self.R2_func()
+            self.GREEDY_func()
         else:
             return
         return

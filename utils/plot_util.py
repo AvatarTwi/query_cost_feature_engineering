@@ -1,12 +1,11 @@
 def name_align(name):
-    name = name.replace("knob_model_filter/save_model_QPPNet", "FSO(QPPNet)")
-    name = name.replace("knob_model_shap/save_model_QPPNet", "FSO(QPPNet)")
-    name = name.replace("knob_model_filter/save_model_MSCN", "FSO(MSCN)")
-    name = name.replace("knob_model_shap/save_model_MSCN", "FSO(MSCN)")
+    name = name.replace("snapshot_model_filter/save_model_QPPNet", "FSO(QPPNet)")
+    name = name.replace("snapshot_model_FR/save_model_QPPNet", "FSO(QPPNet)")
+    name = name.replace("snapshot_model_filter/save_model_MSCN", "FSO(MSCN)")
+    name = name.replace("snapshot_model_FR/save_model_MSCN", "FSO(MSCN)")
     name = name.replace("origin_model/save_model_QPPNet", "QPPNet")
     name = name.replace("origin_model/save_model_MSCN", "MSCN")
     return name
-
 
 def sort(plan, dict_alls):
     for k in dict_alls.keys():

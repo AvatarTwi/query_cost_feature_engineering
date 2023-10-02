@@ -68,7 +68,7 @@ class DeepR2():
 
         print("default_eval_value", self.default_eval_value)
 
-        self.R2_func()
+        self.GREEDY_func()
 
     def init_model(self, table_list_len, plan_list_len):
         self.model = MSCN(table_list_len, plan_list_len, 256).to(self.device)
@@ -80,7 +80,7 @@ class DeepR2():
         default_eval_value = self.calculate(result, self.TrainY)
         return default_eval_value
 
-    def R2_func(self):
+    def GREEDY_func(self):
         min_col = -1
 
         bar = progressbar.ProgressBar(widgets=[
@@ -100,7 +100,7 @@ class DeepR2():
                 plan_list_len -= 1
 
             self.init_model(table_list_len, plan_list_len)
-            self.R2_train()
+            self.GREEDY_train()
 
             result = self.model(self.TrainX[:,:, self.col])
             temp_eval_value = self.calculate(result, self.TrainY)
@@ -116,12 +116,12 @@ class DeepR2():
             except:
                 self.plan_list_len -= 1
 
-            self.R2_func()
+            self.GREEDY_func()
         else:
             return
         return
 
-    def R2_train(self):
+    def GREEDY_train(self):
         for epoch in range(50):
             result = self.model(self.TrainX[:,:, self.col])
             loss = torch.sum(torch.abs(self.TrainY - result))

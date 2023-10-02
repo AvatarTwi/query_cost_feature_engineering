@@ -78,21 +78,21 @@ def defaultParser():
     # 2000,4000,6000,8000,10000
     parser.add_argument('--scale', type=int, default=2000, help='data scale')
 
-    # 'tpch','sysbench','job'
-    parser.add_argument('--workload', type=str, default='job', help='benchmark')
+    # 'TPCH','Sysbench','job-light'
+    parser.add_argument('--workload', type=str, default='job-light', help='benchmark')
 
     # "QPPNet","MSCN"
     parser.add_argument('--model', type=str, default='QPPNet', help='qppnet or mscn')
 
     # "origin_model",
-    # "knob_model",
-    # "knob_modeltransfer",
-    # "knob_modeltransfer_template",
-    # "knob_model_shap", or "qcfe",
-    # "knob_model_grad",
-    # 'knob_model_greedy',
-    # 'knob_modeltemplate' + str(template_num),
-    parser.add_argument('--type', type=str, default='origin_model', help='mid dir path')
+    # "snapshot_model",
+    # "snapshot_modeltransfer",
+    # "snapshot_modeltransfer_template",
+    # "snapshot_model_FR",
+    # "snapshot_model_GD",
+    # 'snapshot_model_GREEDY',
+    # 'snapshot_modeltemplate' + str(template_num),
+    parser.add_argument('--type', type=str, default='snapshot_modeltransfer', help='mid dir path')
 
     return parser
 

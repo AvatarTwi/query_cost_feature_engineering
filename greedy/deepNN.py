@@ -55,14 +55,14 @@ class NeuralUnit(nn.Module):
     def freeze(self):
         # To freeze the residual layers
         for param in self.network.parameters():
-            param.require_grad = False
+            param.require_GD = False
         for param in self.network.fc.parameters():
-            param.require_grad = True
+            param.require_GD = True
 
     def unfreeze(self):
         # Unfreeze all layers
         for param in self.network.parameters():
-            param.require_grad = True
+            param.require_GD = True
 
 
 class DeepR2():
@@ -82,14 +82,14 @@ class DeepR2():
 
         print("default_eval_value", self.default_eval_value)
 
-        self.R2_func()
+        self.GREEDY_func()
 
     def default(self):
         result = self.model(self.TrainX)
         default_eval_value = self.calculate(result[:, 0], self.TrainY)
         return default_eval_value
 
-    def R2_train(self):
+    def GREEDY_train(self):
         # sysbench
         # tpch 10
         # job 50
@@ -107,7 +107,7 @@ class DeepR2():
         self.optimizer = torch.optim.Adam(self.model.parameters(), 1e-3)
         self.scheduler = lr_scheduler.StepLR(self.optimizer, step_size=1000, gamma=0.95)
 
-    def R2_func(self):
+    def GREEDY_func(self):
         min_col = -1
 
         bar = progressbar.ProgressBar(widgets=[
@@ -120,7 +120,7 @@ class DeepR2():
             self.col.remove(i)
 
             self.init_model()
-            self.R2_train()
+            self.GREEDY_train()
 
             result = self.model(self.TrainX[:, self.col])
             temp_eval_value = self.calculate(result[:, 0], self.TrainY)
@@ -130,7 +130,7 @@ class DeepR2():
                 min_col = i
         if min_col != -1:
             self.filter_values.remove(min_col)
-            self.R2_func()
+            self.GREEDY_func()
         else:
             return
         return

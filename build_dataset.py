@@ -25,11 +25,11 @@ from utils.util import Utils
 PSQLTPCH={
     "dim_dict":{
         "origin_model": origin_tpch_dim,
-        "knob_model": knob_tpch_dim,
+        "snapshot_model": knob_tpch_dim,
     },
     "dataset":{
         "origin_model": PSQLTPCHDataSet_origin,
-        "knob_model": PSQLTPCHDataSet_knob,
+        "snapshot_model": PSQLTPCHDataSet_knob,
         "serialize": PSQLTPCHDataSet_serialize,
         "serialize_knob": PSQLTPCHDataSet_knob_serialize,
     }
@@ -37,11 +37,11 @@ PSQLTPCH={
 PSQLSysbench={
     "dim_dict":{
         "origin_model": origin_sysbench_dim,
-        "knob_model": knob_sysbench_dim,
+        "snapshot_model": knob_sysbench_dim,
     },
     "dataset":{
         "origin_model": SysbenchDataset_origin,
-        "knob_model": SysbenchDataset_knob,
+        "snapshot_model": SysbenchDataset_knob,
         "serialize": SysbenchDataset_serialize,
         "serialize_knob": SysbenchDataset_knob_serialize,
     }
@@ -49,11 +49,11 @@ PSQLSysbench={
 PSQLJOB={
     "dim_dict":{
         "origin_model": origin_job_dim,
-        "knob_model": knob_job_dim,
+        "snapshot_model": knob_job_dim,
     },
     "dataset":{
         "origin_model": jobDataset_origin,
-        "knob_model": jobDataset_knob,
+        "snapshot_model": jobDataset_knob,
         "serialize": jobDataset_serialize,
         "serialize_knob": jobDataset_knob_serialize,
     }
@@ -75,7 +75,7 @@ def build_ds(opt, mid_data_dir):
             dataset = DATASET_TYPE[opt.dataset]['dataset']['serialize'](opt)
             with open(opt.mid_data_dir + '/serialize_dim_dict.pickle', 'rb') as f:
                 dim_dict = pickle.load(f)
-        if "knob_model" in mid_data_dir:
+        if "snapshot_model" in mid_data_dir:
             dataset = DATASET_TYPE[opt.dataset]['dataset']['serialize_knob'](opt)
             with open(opt.mid_data_dir + '/serialize_knob_dim_dict.pickle', 'rb') as f:
                 dim_dict = pickle.load(f)
@@ -85,8 +85,8 @@ def build_ds(opt, mid_data_dir):
         dataset = DATASET_TYPE[opt.dataset]['dataset']['origin_model'](opt)
         dim_dict = DATASET_TYPE[opt.dataset]['dim_dict']['origin_model']
 
-    elif "knob_model" in mid_data_dir:
-        dataset = DATASET_TYPE[opt.dataset]['dataset']['knob_model'](opt)
-        dim_dict = DATASET_TYPE[opt.dataset]['dim_dict']['knob_model'](config.cost_factor_dict)
+    elif "snapshot_model" in mid_data_dir:
+        dataset = DATASET_TYPE[opt.dataset]['dataset']['snapshot_model'](opt)
+        dim_dict = DATASET_TYPE[opt.dataset]['dim_dict']['snapshot_model'](config.cost_factor_dict)
 
     return dataset, dim_dict
