@@ -71,17 +71,6 @@ python main.py --scale 2000 --workload Sysbench --model MSCN --type snapshot_mod
 python main.py --scale 2000 --workload job-light --model MSCN --type snapshot_model_FR
 ```
 
-### Template
-
-The `<scale>` is used to set the scale of template queries
-
-```shell
-python main.py --scale 4000 --workload TPCH --model QPPNet --type snapshot_modeltemplate1
-python main.py --scale 4000 --workload TPCH --model QPPNet --type snapshot_modeltemplate2
-python main.py --scale 4000 --workload TPCH --model QPPNet --type snapshot_modeltemplate3
-python main.py --scale 4000 --workload TPCH --model QPPNet --type snapshot_modeltemplate4
-```
-
 ## Reference
 
 If you find this repository useful in your work, please cite our paper:
