@@ -91,8 +91,8 @@ def defaultParser():
     # "snapshot_model_FR",
     # "snapshot_model_GD",
     # 'snapshot_model_GREEDY',
-    # 'snapshot_modeltemplate' + str(template_num),
-    parser.add_argument('--type', type=str, default='snapshot_modeltransfer', help='mid dir path')
+    # 'snapshot_modeltemplate' + str(scale),
+    parser.add_argument('--type', type=str, default='origin_model', help='mid dir path')
 
     return parser
 
