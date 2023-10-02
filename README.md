@@ -35,6 +35,12 @@ conda install --yes --file requirements.txt
 
 ## Run Experiments
 
+### Data Preparation
+
+Our training data and testing data can be downloaded in the [link](https://drive.google.com/file/d/1iSzXmHDcSgeDRACWgTjdjBFMACsnCXAG/view?usp=sharing). Unzip it in the root dir of the code.
+
+### Main Script
+
 The main script used for running experiments is `main.py`. It can be invoked using the following syntax:
 
 ```shell
