@@ -2,7 +2,7 @@
 
 QCFE is a feature engineering to improve the time-accuracy efficiency for query cost estimation. This is the implementation described in the paper: 
 
-QCFE: An efficient Feature engineering for query cost estimation.
+QCFE: An efficient Feature engineering for query cost estimation.[PDF](https://arxiv.org/pdf/2310.00877.pdf)
 
 ![qcfe](https://typora-picpool-1314405309.cos.ap-nanjing.myqcloud.com/img/qcfe.png)
 
@@ -82,6 +82,13 @@ python main.py --scale 2000 --workload job-light --model MSCN --type snapshot_mo
 If you find this repository useful in your work, please cite our paper:
 
 ```
-
+@misc{yan2023qcfe,
+      title={QCFE: An efficient Feature engineering for query cost estimation}, 
+      author={Yu Yan and Hongzhi Wang and Junfang Huang and Dake Zhong and Man Yang and Kaixin Zhang and Tao Yu and Tianqing Wan},
+      year={2023},
+      eprint={2310.00877},
+      archivePrefix={arXiv},
+      primaryClass={cs.DB}
+}
 ```
 
