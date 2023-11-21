@@ -106,7 +106,7 @@ class QPPNet():
 
         self.dim_dict = pass_dim_dict
 
-        if 'eval' in opt.mode:
+        if '_eval' in opt.mode:
             self.filter_type = opt.mode.replace("_eval", "")
         else:
             self.filter_type = opt.mid_data_dir.split("_")[-1]
