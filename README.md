@@ -92,3 +92,15 @@ If you find this repository useful in your work, please cite our paper:
 }
 ```
 
+## Code Citations
+
+We utilize some open source libraries to implement our experiments. The specific citation is as follows:
+
+```
+Github repository: SHAP. https://github.com/shap/shap.
+Github repository: QPPNet in PyTorch. https://github.com/rabbit721/QPPNet.
+Github repository: MSCN. https: //github.com/andreaskipf/learnedcardinalities.
+```
+
+
+
