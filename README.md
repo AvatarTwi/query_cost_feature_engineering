@@ -4,7 +4,7 @@ QCFE is a feature engineering to improve the time-accuracy efficiency for query 
 
 QCFE: An efficient Feature engineering for query cost estimation.[PDF](https://arxiv.org/pdf/2310.00877.pdf)
 
-![qcfe](https://typora-picpool-1314405309.cos.ap-nanjing.myqcloud.com/img/qcfe.png)
+![qcfe1](https://typora-picpool-1314405309.cos.ap-nanjing.myqcloud.com/img/qcfe1.png)
 
 ## Source Code Structure
 
